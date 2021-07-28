@@ -1,0 +1,45 @@
+:host:nth-child(even) {
+  background: #f1f0f8;
+}
+
+:host {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 4px;
+}
+
+.__actions {
+
+}
+
+.__name {
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 16px;
+}
+
+.__points {
+  display: inline-flex;
+  align-items: center;
+}
+
+.__points-icon {
+  height: 16px;
+  width: 16px;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.__list-header {
+  display: flex;
+}
+
+.__description.__description--done-today {
+  color: gray;
+  font-style: italic;
+
+  .__name {
+    font-size: 12px;
+  }
+}

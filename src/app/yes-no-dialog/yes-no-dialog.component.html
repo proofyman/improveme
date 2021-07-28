@@ -1,0 +1,11 @@
+<div class="__text">
+  {{data.text}}
+</div>
+
+<button (click)="dialogRef.close(true)" mat-button>Да</button>
+<button
+  (click)="dialogRef.close(false)"
+  cdkFocusInitial
+  mat-button>
+  Нет
+</button>

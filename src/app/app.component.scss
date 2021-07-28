@@ -1,0 +1,11 @@
+@import "~src/variables";
+
+:host {
+  background: $backgroundColor;
+  display: flex;
+  flex-direction: column;
+}
+
+.__menu {
+  min-width: 264px;
+}

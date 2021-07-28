@@ -1,0 +1,12 @@
+<div
+  (click)="toMainScreen()"
+  class="__logo">
+  Improveme!
+</div>
+
+<div
+  (click)="toScoringHistory()"
+  class="__counter">
+  {{todayScore$ | async}}&nbsp;
+  <mat-icon>star</mat-icon>
+</div>

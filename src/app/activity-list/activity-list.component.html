@@ -1,0 +1,39 @@
+<ng-container *ngIf="activities$ | async; let activities">
+  <ng-container *ngIf="activities.length; else zeroState">
+    <div class="__list-header">
+      <a [routerLink]="['/create-activity']">Добавить активность</a>
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_horiz</mat-icon>
+      </button>
+    </div>
+
+    <mat-menu #menu="matMenu">
+      <button
+        (click)="toggleEditMode()"
+        mat-menu-item>
+        {{isEditMode ? toViewModeText : toEditModeText}}
+      </button>
+    </mat-menu>
+
+    <div class="__container">
+      <app-activity-list-item
+        *ngFor="let activity of activities; trackBy: trackByName"
+        [isDoneToday]="isDoneToday(activity)"
+        [isEditMode]="isEditMode"
+        [name]="activity.name"
+        [points]="activity.points"
+        (score)="scoreActivity(activity)"
+        (remove)="deleteActivity(activity)"
+      >
+      </app-activity-list-item>
+    </div>
+
+  </ng-container>
+</ng-container>
+
+<ng-template #zeroState>
+  <div>
+    Нету активностей, которые бы можно было отметить.
+    <a [routerLink]="['/create-activity']">Добавить</a>
+  </div>
+</ng-template>

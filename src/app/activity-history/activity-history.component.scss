@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.__record {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding: 2px;
+}
+
+.__day-header {
+  font-weight: 500;
+  font-size: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.__day-container {
+  user-select: none;
+  margin-bottom: 24px;
+}
+
+.__points-icon {
+  height: 16px;
+  width: 16px;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.__record-points {
+  display: inline-flex;
+  align-items: center;
+}
+
+.__record-time {
+  font-size: 10px;
+  color: #9d9d9d;
+}

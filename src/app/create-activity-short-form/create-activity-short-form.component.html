@@ -1,0 +1,22 @@
+<form
+  class="__form"
+  (ngSubmit)="addActivity()">
+  <mat-form-field>
+    <mat-label>Название</mat-label>
+    <input
+      matInput
+      [formControl]="$any(form.get('name'))"
+      type="text">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Очков за задание</mat-label>
+    <input
+      matInput
+      [formControl]="$any(form.controls.points)"
+      type="number">
+  </mat-form-field>
+
+
+  <button mat-button>Добавить!</button>
+</form>

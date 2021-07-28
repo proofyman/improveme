@@ -1,0 +1,15 @@
+<div
+  class="__day-container"
+  *ngFor="let dayInfo of daysInfo$ | async">
+  <div class="__day-header">
+    <span>{{dayInfo.viewDate}}</span>
+    <span>{{dayInfo.pointsTotal}}&nbsp;<mat-icon class="__points-icon">star</mat-icon></span>
+  </div>
+  <div class="__record"
+       *ngFor="let record of dayInfo.records">
+    <span class="__record-name">{{record.name}} <span class="__record-time">{{record.viewTime}}</span></span>
+    <span class="__record-points">
+      {{record.points}}&nbsp;<mat-icon class="__points-icon">star</mat-icon>
+    </span>
+  </div>
+</div>
