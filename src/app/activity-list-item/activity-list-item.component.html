@@ -6,6 +6,7 @@
 
 <div class="__actions">
   <button
+    class="__actions-button"
     *ngIf="!isEditMode; else deleteBtn"
     (click)="score.emit()" mat-flat-button>
     <span class="__points"> +{{points}}&nbsp;<mat-icon class="__points-icon">star</mat-icon></span>

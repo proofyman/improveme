@@ -1,14 +1,22 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
 import {LocalStorageService} from "./local-storage.service";
+import {sub} from "date-fns";
 
 let ACTIVITY_DATA_KEY = 'ACTIVITY';
 let AR_DATA_KEY = 'ACTIVITY_RECORD';
+
+export const EXTRA_HOURS_IN_DAY = 5; // Новый день начинается в 5 утра.
+
+export function getDateNormalizedToHumanCycle(timestamp: number) {
+  return sub(timestamp, {hours: EXTRA_HOURS_IN_DAY});
+}
 
 export interface IActivity {
   id?: number;
   name: string;
   points: number;
+  isOneTime: boolean;
 }
 
 export interface IActivityRecord {
@@ -67,5 +75,9 @@ export class ActivitiesService {
     this.activityRecords = [activityRecord, ...this.activityRecords];
     this.localStorageService.saveData(AR_DATA_KEY, this.activityRecords)
     this.activityRecords$.next(this.activityRecords);
+
+    if (activity.isOneTime) {
+      this.deleteActivity(activity);
+    }
   }
 }

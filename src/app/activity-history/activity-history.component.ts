@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivitiesService, IActivityRecord} from "../activities.service";
+import {ActivitiesService, EXTRA_HOURS_IN_DAY, getDateNormalizedToHumanCycle, IActivityRecord} from "../activities.service";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
-import {format} from "date-fns";
+import {format, sub} from "date-fns";
 
 interface IDayInfo {
   viewDate: string;
@@ -39,7 +39,7 @@ export class ActivityHistoryComponent implements OnInit {
             return {
               name: ar.activityName,
               viewTime: format(ar.timestamp, 'HH:mm'),
-              viewDate: format(ar.timestamp, 'dd.MM.yyyy'),
+              viewDate: format(getDateNormalizedToHumanCycle(ar.timestamp), 'dd.MM.yyyy'),
               timestamp: ar.timestamp,
               points: ar.points
             };

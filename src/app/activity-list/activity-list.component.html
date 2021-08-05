@@ -1,5 +1,4 @@
 <ng-container *ngIf="activities$ | async; let activities">
-  <ng-container *ngIf="activities.length; else zeroState">
     <div class="__list-header">
       <a [routerLink]="['/create-activity']">Добавить активность</a>
       <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -13,27 +12,54 @@
         mat-menu-item>
         {{isEditMode ? toViewModeText : toEditModeText}}
       </button>
+
+      <button
+        (click)="openScoreNotFromListModal()"
+        mat-menu-item>
+        Засчитать не из списка
+      </button>
     </mat-menu>
 
     <div class="__container">
-      <app-activity-list-item
-        *ngFor="let activity of activities; trackBy: trackByName"
-        [isDoneToday]="isDoneToday(activity)"
-        [isEditMode]="isEditMode"
-        [name]="activity.name"
-        [points]="activity.points"
-        (score)="scoreActivity(activity)"
-        (remove)="deleteActivity(activity)"
-      >
-      </app-activity-list-item>
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+        <mat-tab label="Регулярные">
+          <ng-container *ngIf="activities.length; else zeroState">
+            <app-activity-list-item
+              *ngFor="let activity of activities$ | async; trackBy: trackByName"
+              [isDoneToday]="isDoneToday(activity)"
+              [isEditMode]="isEditMode"
+              [name]="activity.name"
+              [points]="activity.points"
+              (score)="scoreActivity(activity)"
+              (remove)="deleteActivity(activity)"
+            >
+            </app-activity-list-item>
+          </ng-container>
+        </mat-tab>
+        <mat-tab label="Единоразовые">
+          <ng-container *ngIf="oneTimeActivities$ | async; let oneTimeActivities">
+            <ng-container *ngIf="oneTimeActivities.length; else zeroState">
+              <app-activity-list-item
+                *ngFor="let activity of oneTimeActivities; trackBy: trackByName"
+                [isDoneToday]="isDoneToday(activity)"
+                [isEditMode]="isEditMode"
+                [name]="activity.name"
+                [points]="activity.points"
+                (score)="scoreActivity(activity)"
+                (remove)="deleteActivity(activity)"
+              >
+              </app-activity-list-item>
+            </ng-container>
+          </ng-container>
+
+        </mat-tab>
+      </mat-tab-group>
     </div>
 
-  </ng-container>
 </ng-container>
 
 <ng-template #zeroState>
-  <div>
+  <div class="__zero-state">
     Нету активностей, которые бы можно было отметить.
-    <a [routerLink]="['/create-activity']">Добавить</a>
   </div>
 </ng-template>

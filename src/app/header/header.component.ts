@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivitiesService} from "../activities.service";
+import {ActivitiesService, EXTRA_HOURS_IN_DAY, getDateNormalizedToHumanCycle} from "../activities.service";
 import isToday from 'date-fns/isToday';
-import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {combineLatest, interval, Observable} from "rxjs";
+import {map, startWith} from "rxjs/operators";
 import {RoutingService} from "../routing.service";
+import {sub} from "date-fns";
 
 @Component({
   selector: 'app-header',
@@ -19,11 +20,15 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.todayScore$ = this.activitiesService.getActivityRecords().pipe(
+    this.todayScore$ =
+      combineLatest([
+        this.activitiesService.getActivityRecords(),
+        interval(5000).pipe(startWith(0))  // просто обновляем список каждые 5 сек, это вид проверки на конец дня
+      ]).pipe(
       map(
-        arList => {
+        ([arList]) => {
           return arList
-            .filter(ar => isToday(ar.timestamp))
+            .filter(ar => isToday(getDateNormalizedToHumanCycle(ar.timestamp)))
             .reduce((acc, ar) => acc + ar.points, 0)
         }
       )

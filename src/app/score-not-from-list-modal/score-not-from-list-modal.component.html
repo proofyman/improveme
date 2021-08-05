@@ -1,6 +1,6 @@
 <form
   class="__form"
-  (ngSubmit)="addActivity()">
+  (ngSubmit)="addActivityRecord()">
   <mat-form-field>
     <mat-label>Название</mat-label>
     <input
@@ -17,7 +17,15 @@
       type="number">
   </mat-form-field>
 
-  <mat-checkbox [formControl]="$any(form.controls.isOneTime)">Нерегулярное</mat-checkbox>
+  <div>
+    <button
+      class="__button"
+      type="button"
+      (click)="closeModal()"
+      mat-button>Отменить</button>
+    <button
+      class="__button"
+      mat-button>Зачесть!</button>
+  </div>
 
-  <button mat-button>Добавить!</button>
 </form>

@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {combineLatest, Observable} from "rxjs";
-import {ActivitiesService, IActivity} from "../activities.service";
+import {Component, HostBinding, HostListener, OnInit} from '@angular/core';
+import {combineLatest, interval, Observable} from "rxjs";
+import {ActivitiesService, getDateNormalizedToHumanCycle, IActivity} from "../activities.service";
 import {ModalsService} from "../modals.service";
-import {map, tap, withLatestFrom} from "rxjs/operators";
+import {map, startWith} from "rxjs/operators";
 import {sortBy, uniq} from 'lodash-es';
+import {isToday} from "date-fns";
+import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score-not-from-list-modal.component";
 
 @Component({
   selector: 'app-activity-list',
@@ -14,9 +16,12 @@ export class ActivityListComponent implements OnInit {
   toEditModeText = 'Редактировать список';
   toViewModeText = 'К просмотру списка';
   activities$!: Observable<any>;
+  oneTimeActivities$!: Observable<any>;
   todayActivities$!: Observable<string[]>;
   todayArNames: string[] = [];
   isEditMode = false;
+  isRegularListView = true;
+  selectedTabIndex: number = 0;
 
   constructor(
     private activitiesService: ActivitiesService,
@@ -26,23 +31,36 @@ export class ActivityListComponent implements OnInit {
   ngOnInit(): void {
     this.todayActivities$ = this.activitiesService.getActivityRecords().pipe(
       map(ars => {
-        let records = ars.slice(0, 200); // костыль, чтобы не анализировать всю историю
+        let records = ars
+          .slice(0, 200) // костыль, чтобы не анализировать всю историю
+          .filter(ar => isToday(getDateNormalizedToHumanCycle(ar.timestamp)));
         return uniq(records.map(ar => ar.activityName))
       })
     );
     this.activities$ = combineLatest([
-      this.activitiesService.getActivities(),
-      this.todayActivities$
+      this.activitiesService.getActivities().pipe(
+        map(activities => activities.filter(a => !a.isOneTime))
+      ),
+      this.todayActivities$,
+      interval(5000).pipe(startWith(0)) // просто обновляем список каждые 5 сек, это вид проверки на конец дня
     ]).pipe(
       map(([activities, todayArs]) => {
         return sortBy(activities, a => todayArs.includes(a.name))
-      }),
-      tap(a => console.log(a))
+      })
+    );
+
+    this.oneTimeActivities$ = this.activitiesService.getActivities().pipe(
+      map(activities => activities.filter(a => a.isOneTime))
     );
 
     this.todayActivities$.subscribe(todayArNames => {
       this.todayArNames = todayArNames;
     });
+  }
+
+  @HostListener('swipe')
+  changeListView() {
+    this.selectedTabIndex = this.selectedTabIndex === 0 ? 1 : 0;
   }
 
   deleteActivity(activity: IActivity) {
@@ -67,5 +85,17 @@ export class ActivityListComponent implements OnInit {
 
   trackByName(index: number, activity: IActivity) {
     return activity.name;
+  }
+
+  openScoreNotFromListModal() {
+    this.modalsService.open(ScoreNotFromListModalComponent)
+      .then((res: IActivity) => {
+        this.activitiesService.scoreActivity(res)
+      })
+      .catch((res: any) => {
+        if (res) {
+          throw 'Unknown error';
+        }
+      })
   }
 }

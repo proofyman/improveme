@@ -22,6 +22,9 @@ import {MatListModule} from "@angular/material/list";
 import { MatDividerModule} from "@angular/material/divider";
 import {MatMenuModule} from "@angular/material/menu";
 import * as Hammer from 'hammerjs';
+import { ScoreNotFromListModalComponent } from './score-not-from-list-modal/score-not-from-list-modal.component';
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatTabsModule} from "@angular/material/tabs";
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -39,9 +42,12 @@ export class MyHammerConfig extends HammerGestureConfig {
     ActivityListItemComponent,
     MainPageComponent,
     YesNoDialogComponent,
-    HeaderComponent
+    HeaderComponent,
+    ScoreNotFromListModalComponent
   ],
   imports: [
+    MatTabsModule,
+    MatCheckboxModule,
     MatMenuModule,
     MatDividerModule,
     MatListModule,
