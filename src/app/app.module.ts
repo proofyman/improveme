@@ -32,8 +32,11 @@ import { SettingsPageComponent } from './settings-page/settings-page.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
-  overrides = <any>{
-    swipe: {direction: Hammer.DIRECTION_ALL},
+  buildHammer(element: HTMLElement) {
+    let mc = new Hammer(element, {
+      touchAction: "auto",
+    });
+    return mc;
   }
 }
 
