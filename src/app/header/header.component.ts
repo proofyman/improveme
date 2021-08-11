@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivitiesService, EXTRA_HOURS_IN_DAY, getDateNormalizedToHumanCycle} from "../activities.service";
-import isToday from 'date-fns/isToday';
+import {
+  ActivitiesService,
+  shouldScoreToday
+} from "../activities.service";
 import {combineLatest, interval, Observable} from "rxjs";
 import {map, startWith} from "rxjs/operators";
 import {RoutingService} from "../routing.service";
-import {sub} from "date-fns";
 
 @Component({
   selector: 'app-header',
@@ -28,7 +29,7 @@ export class HeaderComponent implements OnInit {
       map(
         ([arList]) => {
           return arList
-            .filter(ar => isToday(getDateNormalizedToHumanCycle(ar.timestamp)))
+            .filter(ar => shouldScoreToday(ar.timestamp))
             .reduce((acc, ar) => acc + ar.points, 0)
         }
       )

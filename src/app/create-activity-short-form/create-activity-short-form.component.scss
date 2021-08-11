@@ -3,3 +3,11 @@
   flex-direction: column;
   padding: 16px;
 }
+
+.__form-btns {
+  margin-top: 16px;
+}
+
+button + button {
+  margin-left: 8px;
+}

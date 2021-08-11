@@ -1,11 +1,12 @@
-import {Component, HostBinding, HostListener, OnInit} from '@angular/core';
+import {Component, HostBinding, HostListener, OnInit, ViewChild} from '@angular/core';
 import {combineLatest, interval, Observable} from "rxjs";
-import {ActivitiesService, getDateNormalizedToHumanCycle, IActivity} from "../activities.service";
+import {ActivitiesService, getDateNormalizedToHumanCycle, IActivity, shouldScoreToday} from "../activities.service";
 import {ModalsService} from "../modals.service";
 import {map, startWith} from "rxjs/operators";
 import {sortBy, uniq} from 'lodash-es';
-import {isToday} from "date-fns";
 import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score-not-from-list-modal.component";
+import {MatMenuTrigger} from "@angular/material/menu";
+import {RoutingService} from "../routing.service";
 
 @Component({
   selector: 'app-activity-list',
@@ -13,8 +14,12 @@ import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score
   styleUrls: ['./activity-list.component.scss']
 })
 export class ActivityListComponent implements OnInit {
+  @ViewChild('itemMenuTrigger', {read: MatMenuTrigger})
+  trigger!: MatMenuTrigger;
+
   toEditModeText = 'Редактировать список';
   toViewModeText = 'К просмотру списка';
+  contextMenuPosition = { x: '0px', y: '0px' };
   activities$!: Observable<any>;
   oneTimeActivities$!: Observable<any>;
   todayActivities$!: Observable<string[]>;
@@ -25,6 +30,7 @@ export class ActivityListComponent implements OnInit {
 
   constructor(
     private activitiesService: ActivitiesService,
+    private routingService: RoutingService,
     private modalsService: ModalsService
   ) {}
 
@@ -33,7 +39,7 @@ export class ActivityListComponent implements OnInit {
       map(ars => {
         let records = ars
           .slice(0, 200) // костыль, чтобы не анализировать всю историю
-          .filter(ar => isToday(getDateNormalizedToHumanCycle(ar.timestamp)));
+          .filter(ar => shouldScoreToday(ar.timestamp));
         return uniq(records.map(ar => ar.activityName))
       })
     );
@@ -97,5 +103,19 @@ export class ActivityListComponent implements OnInit {
           throw 'Unknown error';
         }
       })
+  }
+
+  openContextMenu(event: any, activity: IActivity) {
+    setTimeout(() => {
+      window.navigator.vibrate(50)
+      this.contextMenuPosition.x = Math.max(20, event.center.x - 120) + 'px';
+      this.contextMenuPosition.y = event.center.y + 20 + 'px';
+      this.trigger.menuData = {activity: activity};
+      this.trigger.openMenu();
+    }, 350);
+  }
+
+  editActivity(activity: IActivity) {
+    this.routingService.navigate(`activities/${activity.name}`);
   }
 }

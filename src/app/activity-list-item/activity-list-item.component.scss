@@ -9,6 +9,10 @@
   padding: 4px 4px;
 }
 
+:host:active {
+  background: #e5e4ea;
+}
+
 .__actions {
   min-width: 84px;
 }

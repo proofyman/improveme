@@ -8,17 +8,19 @@
 
     <mat-menu #menu="matMenu">
       <button
-        (click)="toggleEditMode()"
-        mat-menu-item>
-        {{isEditMode ? toViewModeText : toEditModeText}}
-      </button>
-
-      <button
         (click)="openScoreNotFromListModal()"
         mat-menu-item>
         Засчитать не из списка
       </button>
     </mat-menu>
+
+    <div
+      style="visibility: hidden; position: fixed"
+      [style.left]="contextMenuPosition.x"
+      [style.top]="contextMenuPosition.y"
+      #itemMenuTrigger
+      [matMenuTriggerFor]="itemMenu"
+      class="__item-mat-menu-trigger"></div>
 
     <div class="__container">
       <mat-tab-group [(selectedIndex)]="selectedTabIndex">
@@ -26,12 +28,12 @@
           <ng-container *ngIf="activities.length; else zeroState">
             <app-activity-list-item
               *ngFor="let activity of activities$ | async; trackBy: trackByName"
+              (press)="openContextMenu($event, activity)"
               [isDoneToday]="isDoneToday(activity)"
               [isEditMode]="isEditMode"
               [name]="activity.name"
               [points]="activity.points"
               (score)="scoreActivity(activity)"
-              (remove)="deleteActivity(activity)"
             >
             </app-activity-list-item>
           </ng-container>
@@ -41,12 +43,12 @@
             <ng-container *ngIf="oneTimeActivities.length; else zeroState">
               <app-activity-list-item
                 *ngFor="let activity of oneTimeActivities; trackBy: trackByName"
+                (press)="openContextMenu($event, activity)"
                 [isDoneToday]="isDoneToday(activity)"
                 [isEditMode]="isEditMode"
                 [name]="activity.name"
                 [points]="activity.points"
                 (score)="scoreActivity(activity)"
-                (remove)="deleteActivity(activity)"
               >
               </app-activity-list-item>
             </ng-container>
@@ -57,6 +59,22 @@
     </div>
 
 </ng-container>
+
+<mat-menu #itemMenu="matMenu">
+  <ng-template matMenuContent let-activity="activity">
+    <button
+      (click)="editActivity(activity)"
+      mat-menu-item>
+      Редактировать
+    </button>
+
+    <button
+      (click)="deleteActivity(activity)"
+      mat-menu-item>
+      Удалить
+    </button>
+  </ng-template>
+</mat-menu>
 
 <ng-template #zeroState>
   <div class="__zero-state">

@@ -14,6 +14,10 @@ const routes: Routes = [
     component: CreateActivityShortFormComponent
   },
   {
+    path: 'activities/:name',
+    component: CreateActivityShortFormComponent
+  },
+  {
     path: 'scoring-history',
     component: ActivityHistoryComponent
   }

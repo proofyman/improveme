@@ -25,6 +25,7 @@ import * as Hammer from 'hammerjs';
 import { ScoreNotFromListModalComponent } from './score-not-from-list-modal/score-not-from-list-modal.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatTabsModule} from "@angular/material/tabs";
+import { IonicModule } from '@ionic/angular';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -62,7 +63,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
-    MatButtonModule
+    MatButtonModule,
+    IonicModule.forRoot()
   ],
   providers: [
     {

@@ -17,7 +17,15 @@
       type="number">
   </mat-form-field>
 
-  <mat-checkbox [formControl]="$any(form.controls.isOneTime)">Нерегулярное</mat-checkbox>
+  <mat-checkbox color="primary" [formControl]="$any(form.controls.isOneTime)">Нерегулярное</mat-checkbox>
 
-  <button mat-button>Добавить!</button>
+  <div class="__form-btns">
+    <button
+      (click)="back()"
+      type="button"
+      mat-raised-button>
+      Назад
+    </button>
+    <button color="primary" mat-raised-button>{{saveBtnText}}</button>
+  </div>
 </form>
