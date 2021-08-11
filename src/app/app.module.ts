@@ -26,6 +26,9 @@ import { ScoreNotFromListModalComponent } from './score-not-from-list-modal/scor
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatTabsModule} from "@angular/material/tabs";
 import { IonicModule } from '@ionic/angular';
+import {MatSnackBarModule} from "@angular/material/snack-bar";
+import { NavigationPanelComponent } from './navigation-panel/navigation-panel.component';
+import { SettingsPageComponent } from './settings-page/settings-page.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -44,9 +47,12 @@ export class MyHammerConfig extends HammerGestureConfig {
     MainPageComponent,
     YesNoDialogComponent,
     HeaderComponent,
-    ScoreNotFromListModalComponent
+    ScoreNotFromListModalComponent,
+    NavigationPanelComponent,
+    SettingsPageComponent
   ],
   imports: [
+    MatSnackBarModule,
     MatTabsModule,
     MatCheckboxModule,
     MatMenuModule,

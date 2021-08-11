@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {MainPageComponent} from "./main-page/main-page.component";
 import {CreateActivityShortFormComponent} from "./create-activity-short-form/create-activity-short-form.component";
 import {ActivityHistoryComponent} from "./activity-history/activity-history.component";
+import {SettingsPageComponent} from "./settings-page/settings-page.component";
 
 const routes: Routes = [
   {
@@ -20,6 +21,10 @@ const routes: Routes = [
   {
     path: 'scoring-history',
     component: ActivityHistoryComponent
+  },
+  {
+    path: 'settings',
+    component: SettingsPageComponent
   }
 ];
 

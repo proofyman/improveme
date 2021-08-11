@@ -7,6 +7,7 @@ import {sortBy, uniq} from 'lodash-es';
 import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score-not-from-list-modal.component";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {RoutingService} from "../routing.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-activity-list',
@@ -17,8 +18,6 @@ export class ActivityListComponent implements OnInit {
   @ViewChild('itemMenuTrigger', {read: MatMenuTrigger})
   trigger!: MatMenuTrigger;
 
-  toEditModeText = 'Редактировать список';
-  toViewModeText = 'К просмотру списка';
   contextMenuPosition = { x: '0px', y: '0px' };
   activities$!: Observable<any>;
   oneTimeActivities$!: Observable<any>;
@@ -31,7 +30,8 @@ export class ActivityListComponent implements OnInit {
   constructor(
     private activitiesService: ActivitiesService,
     private routingService: RoutingService,
-    private modalsService: ModalsService
+    private modalsService: ModalsService,
+    private snackbar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -64,11 +64,6 @@ export class ActivityListComponent implements OnInit {
     });
   }
 
-  @HostListener('swipe')
-  changeListView() {
-    this.selectedTabIndex = this.selectedTabIndex === 0 ? 1 : 0;
-  }
-
   deleteActivity(activity: IActivity) {
     this.modalsService.yesNoModal('Точно удалить ?')
       .then(() => {
@@ -79,10 +74,15 @@ export class ActivityListComponent implements OnInit {
 
   scoreActivity(activity: IActivity) {
     this.activitiesService.scoreActivity(activity);
+    this.snackbar.open(`Засчитано "${activity.name}"`, 'Отменить', {
+      duration: 2000
+    }).onAction().subscribe(() => {
+      this.cancelLastScoring(activity);
+    });
   }
 
-  toggleEditMode() {
-    this.isEditMode = !this.isEditMode;
+  cancelLastScoring(activity: IActivity) {
+    this.activitiesService.cancelLastScoring(activity);
   }
 
   isDoneToday(activity: IActivity) {
@@ -96,7 +96,7 @@ export class ActivityListComponent implements OnInit {
   openScoreNotFromListModal() {
     this.modalsService.open(ScoreNotFromListModalComponent)
       .then((res: IActivity) => {
-        this.activitiesService.scoreActivity(res)
+        this.scoreActivity(res)
       })
       .catch((res: any) => {
         if (res) {

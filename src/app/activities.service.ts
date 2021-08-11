@@ -125,4 +125,18 @@ export class ActivitiesService {
     this.localStorageService.saveData(ACTIVITY_DATA_KEY, this.activities)
     this.activities$.next(this.activities);
   }
+
+  cancelLastScoring(activity: IActivity) {
+    let activityIndex = this.activityRecords.findIndex(ar => ar.activityName === activity.name);
+    this.activityRecords.splice(activityIndex, 1);
+    this.activityRecords = [...this.activityRecords];
+    this.localStorageService.saveData(AR_DATA_KEY, this.activityRecords)
+    this.activityRecords$.next(this.activityRecords);
+  }
+
+  clearTodayScorings() {
+    this.activityRecords = this.activityRecords.filter(ar => !shouldScoreToday(ar.timestamp));
+    this.localStorageService.saveData(AR_DATA_KEY, this.activityRecords);
+    this.activityRecords$.next(this.activityRecords);
+  }
 }

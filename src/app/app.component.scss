@@ -10,3 +10,14 @@
 .__menu {
   min-width: 264px;
 }
+
+section {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.__footer {
+  flex-shrink: 0;
+}

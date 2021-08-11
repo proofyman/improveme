@@ -1,0 +1,32 @@
+<span
+  [routerLink]="'/'"
+  [routerLinkActive]="'__btn--active'"
+  [routerLinkActiveOptions]="{exact:true}"
+  class="__btn">
+  <button mat-icon-button>
+    <mat-icon>home</mat-icon>
+  </button>
+  <span class="__btn-description">Главная</span>
+</span>
+
+<span
+  [routerLink]="'/scoring-history'"
+  [routerLinkActive]="'__btn--active'"
+  [routerLinkActiveOptions]="{exact:true}"
+  class="__btn">
+  <button mat-icon-button>
+    <mat-icon>grading</mat-icon>
+  </button>
+  <span class="__btn-description">История</span>
+</span>
+
+<span
+  [routerLink]="'/settings'"
+  [routerLinkActive]="'__btn--active'"
+  [routerLinkActiveOptions]="{exact:true}"
+  class="__btn">
+  <button mat-icon-button>
+    <mat-icon >manage_accounts</mat-icon>
+  </button>
+  <span class="__btn-description">Настройки</span>
+</span>

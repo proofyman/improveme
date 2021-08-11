@@ -1,0 +1,22 @@
+:host {
+  background: #f1f0f8;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 40px 8px 40px;
+}
+
+.__btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  color: #acacac;
+}
+
+.__btn-description {
+  font-size: 11px;
+  margin-top: -6px;
+}
+
+.__btn--active {
+  color: #673ab7;
+}
