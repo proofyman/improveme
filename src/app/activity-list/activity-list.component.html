@@ -44,6 +44,8 @@
               <app-activity-list-item
                 *ngFor="let activity of oneTimeActivities; trackBy: trackByName"
                 (press)="openContextMenu($event, activity)"
+                (onFinishSubtask)="scoreSubtask(activity, $event)"
+                [subtasks]="activity.subtasks"
                 [isDoneToday]="isDoneToday(activity)"
                 [isEditMode]="isEditMode"
                 [name]="activity.name"
@@ -72,6 +74,13 @@
       (click)="deleteActivity(activity)"
       mat-menu-item>
       Удалить
+    </button>
+
+    <button
+      mat-menu-item
+      (click)="splitToSubtasks(activity)"
+      *ngIf="activity.isOneTime">
+      Разбить на подзадачи
     </button>
   </ng-template>
 </mat-menu>

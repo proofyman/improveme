@@ -1,13 +1,20 @@
 import {Component, HostBinding, HostListener, OnInit, ViewChild} from '@angular/core';
 import {combineLatest, interval, Observable} from "rxjs";
-import {ActivitiesService, getDateNormalizedToHumanCycle, IActivity, shouldScoreToday} from "../activities.service";
+import {
+  ActivitiesService,
+  getDateNormalizedToHumanCycle,
+  IActivity,
+  ISubtask,
+  shouldScoreToday
+} from "../activities.service";
 import {ModalsService} from "../modals.service";
 import {map, startWith} from "rxjs/operators";
-import {sortBy, uniq} from 'lodash-es';
+import {every, filter, find, sortBy, uniq} from 'lodash-es';
 import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score-not-from-list-modal.component";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {RoutingService} from "../routing.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {act} from "@ngrx/effects";
 
 @Component({
   selector: 'app-activity-list',
@@ -72,16 +79,46 @@ export class ActivityListComponent implements OnInit {
       .catch(); // Нажатие кнопки "NO"
   }
 
-  scoreActivity(activity: IActivity) {
-    this.activitiesService.scoreActivity(activity);
-    this.snackbar.open(`Засчитано "${activity.name}"`, 'Отменить', {
+  scoreActivity(activity: IActivity, subtask?: ISubtask) {
+    let scorableItem = subtask || activity;
+    this.activitiesService.scoreActivity(scorableItem);
+    this.snackbar.open(`Засчитано "${scorableItem.name}"`, 'Отменить', {
       duration: 2000
     }).onAction().subscribe(() => {
-      this.cancelLastScoring(activity);
+      this.cancelLastScoring(scorableItem);
+
+      if (!activity.isOneTime) return;
+
+      // Восстанавливаем активность, если удаляли ее
+      if (subtask === undefined || every(activity.subtasks, s => s.isFinished)) {
+        if(activity.subtasks) {
+          let trackedSubtask = find(activity.subtasks, s => s.name === subtask?.name);
+          if (trackedSubtask) {
+            trackedSubtask.isFinished = false;
+          }
+        }
+        this.activitiesService.addActivity(activity);
+
+        // Отжимаем назад сабтаск, если отметили его
+
+        return;
+      }
+
+      //Просто отжимаем назад сабтаск
+      if (subtask && !every(activity.subtasks, s => s.isFinished)) {
+        if(activity.subtasks) {
+          let trackedSubtask = find(activity.subtasks, s => s.name === subtask?.name);
+          if (trackedSubtask) {
+            trackedSubtask.isFinished = false;
+          }
+          this.activitiesService.deleteActivity(activity);
+          this.activitiesService.addActivity(activity);
+        }
+      }
     });
   }
 
-  cancelLastScoring(activity: IActivity) {
+  cancelLastScoring(activity: IActivity | ISubtask) {
     this.activitiesService.cancelLastScoring(activity);
   }
 
@@ -117,5 +154,24 @@ export class ActivityListComponent implements OnInit {
 
   editActivity(activity: IActivity) {
     this.routingService.navigate(`activities/${activity.name}`);
+  }
+
+  splitToSubtasks(activity: IActivity) {
+    this.routingService.navigate(`activities/${activity.name}/split`);
+  }
+
+  scoreSubtask(activity: IActivity, subtask: ISubtask) {
+    let index = activity.subtasks?.findIndex(s => s.name === subtask.name);
+    if (index === undefined) return;
+
+    if (activity.subtasks?.[index]) {
+      activity.subtasks[index].isFinished = true;
+      this.activitiesService.updateActivity(activity.name, activity);
+      this.scoreActivity(activity, subtask);
+    }
+
+    if (every(activity.subtasks, s => s.isFinished)) {
+      this.activitiesService.deleteActivity(activity);
+    }
   }
 }

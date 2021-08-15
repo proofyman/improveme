@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivitiesService} from "../activities.service";
+import {ActivitiesService, IActivity} from "../activities.service";
 import {RoutingService} from "../routing.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
@@ -16,6 +16,7 @@ export class CreateActivityShortFormComponent implements OnInit {
   isEditMode = false;
   editedActivityOldName = '';
   destroy$ = new Subject<void>();
+  activity!: IActivity;
 
   constructor(
     private activitiesService: ActivitiesService,
@@ -32,6 +33,7 @@ export class CreateActivityShortFormComponent implements OnInit {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       points: [null, Validators.required],
+      subtasks: [null],
       isOneTime: false
     });
 
@@ -40,9 +42,9 @@ export class CreateActivityShortFormComponent implements OnInit {
       .subscribe((params) => {
       if (params.name) {
         this.isEditMode = true;
-        let activity = this.activitiesService.getActivity(params.name);
-        this.editedActivityOldName = activity.name;
-        this.form.patchValue(activity);
+        this.activity = this.activitiesService.getActivity(params.name);
+        this.editedActivityOldName = this.activity.name;
+        this.form.patchValue(this.activity);
       }
     });
   }

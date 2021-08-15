@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
 import {LocalStorageService} from "./local-storage.service";
-import {add, getHours, isToday, isWithinInterval, startOfToday, startOfTomorrow, startOfYesterday, sub} from "date-fns";
+import {add, getHours, isWithinInterval, startOfToday, startOfTomorrow, startOfYesterday, sub} from "date-fns";
 
 let ACTIVITY_DATA_KEY = 'ACTIVITY';
 let AR_DATA_KEY = 'ACTIVITY_RECORD';
@@ -44,11 +44,18 @@ export function shouldScoreToday(timestamp: number) {
   )
 }
 
+export interface ISubtask {
+  name: string;
+  points: number;
+  isFinished: boolean;
+}
+
 export interface IActivity {
   id?: number;
   name: string;
   points: number;
   isOneTime: boolean;
+  subtasks?: ISubtask[]
 }
 
 export interface IActivityRecord {
@@ -97,7 +104,7 @@ export class ActivitiesService {
     this.activities$.next(this.activities);
   }
 
-  scoreActivity(activity: IActivity) {
+  scoreActivity(activity: IActivity | ISubtask) {
     let activityRecord = {
       timestamp: Date.now(),
       points: activity.points,
@@ -108,8 +115,8 @@ export class ActivitiesService {
     this.localStorageService.saveData(AR_DATA_KEY, this.activityRecords)
     this.activityRecords$.next(this.activityRecords);
 
-    if (activity.isOneTime) {
-      this.deleteActivity(activity);
+    if ((activity as IActivity).isOneTime) {
+      this.deleteActivity(activity as IActivity);
     }
   }
 
@@ -126,7 +133,8 @@ export class ActivitiesService {
     this.activities$.next(this.activities);
   }
 
-  cancelLastScoring(activity: IActivity) {
+  cancelLastScoring(activity: IActivity | ISubtask) {
+    // TODO не возвращается назад одноразовая активность
     let activityIndex = this.activityRecords.findIndex(ar => ar.activityName === activity.name);
     this.activityRecords.splice(activityIndex, 1);
     this.activityRecords = [...this.activityRecords];

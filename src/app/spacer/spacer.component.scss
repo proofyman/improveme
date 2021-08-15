@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  height: 24px;
+}
+
+:host[large] {
+  height: 32px;
+}
+
+:host[small] {
+  height: 16px;
+}

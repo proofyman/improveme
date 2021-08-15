@@ -1,24 +1,45 @@
-<div
-  [class.__description--done-today]="isDoneToday"
-  class="__description">
-  <span class="__name">{{name}}</span>
-</div>
+<ng-container *ngIf="subtasks?.length === null; else combinedTaskView">
+  <div
+    [class.__description--done-today]="isDoneToday"
+    class="__description">
+    <span class="__name">{{name}}</span>
+  </div>
 
-<div class="__actions">
-  <button
-    class="__actions-button"
-    *ngIf="!isEditMode; else deleteBtn"
-    (click)="score.emit()" mat-flat-button>
-    <span class="__points"> +{{points}}&nbsp;<mat-icon class="__points-icon">star</mat-icon></span>
-  </button>
-
-  <ng-template #deleteBtn>
+  <div class="__actions">
     <button
-      (click)="remove.emit()"
-      mat-icon-button
-      type="button"
-      color="primary">
-      <mat-icon>delete</mat-icon>
+      class="__actions-button"
+      *ngIf="!isEditMode; else deleteBtn"
+      (click)="score.emit()" mat-flat-button>
+      <span class="__points"> +{{points}}&nbsp;<mat-icon class="__points-icon">star</mat-icon></span>
     </button>
-  </ng-template>
-</div>
+
+    <ng-template #deleteBtn>
+      <button
+        (click)="remove.emit()"
+        mat-icon-button
+        type="button"
+        color="primary">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </ng-template>
+  </div>
+</ng-container>
+
+<ng-template #combinedTaskView>
+  <div
+    class="__description __description--with-subtasks">
+    <span class="__name">{{name}}</span>
+    <div class="__subtasks">
+      <div
+        class="__subtask"
+        [class.__subtask--finished]="subtask.isFinished"
+        *ngFor="let subtask of subtasks">
+        <mat-checkbox
+          class="__subtask-checkbox"
+          (change)="onFinishSubtask.emit(subtask)"
+          [disabled]="subtask.isFinished"
+          [checked]="subtask.isFinished"></mat-checkbox>{{subtask.name}} <span *ngIf="!subtask.isFinished" class="__subtask-points">({{subtask.points}}<mat-icon class="__subtask-points-icon">star</mat-icon>)</span>
+      </div>
+    </div>
+  </div>
+</ng-template>

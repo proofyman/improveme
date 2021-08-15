@@ -4,6 +4,7 @@ import {MainPageComponent} from "./main-page/main-page.component";
 import {CreateActivityShortFormComponent} from "./create-activity-short-form/create-activity-short-form.component";
 import {ActivityHistoryComponent} from "./activity-history/activity-history.component";
 import {SettingsPageComponent} from "./settings-page/settings-page.component";
+import {SplitActivityToSubtasksFormComponent} from "./split-activity-to-subtasks-form/split-activity-to-subtasks-form.component";
 
 const routes: Routes = [
   {
@@ -16,7 +17,13 @@ const routes: Routes = [
   },
   {
     path: 'activities/:name',
-    component: CreateActivityShortFormComponent
+    component: CreateActivityShortFormComponent,
+    children: [
+    ]
+  },
+  {
+    path: 'activities/:name/split',
+    component: SplitActivityToSubtasksFormComponent
   },
   {
     path: 'scoring-history',

@@ -52,3 +52,40 @@
     font-size: 12px;
   }
 }
+
+.__description--with-subtasks {
+  padding-top: 8px;
+}
+
+.__subtasks {
+  padding: 8px 16px;
+}
+
+.__subtask {
+  font-size: 14px;
+}
+
+.__subtask-points {
+  font-weight: 500;
+}
+.__subtask-checkbox {
+  margin-right: 4px;
+}
+
+.__subtask-points-icon {
+  height: 13px;
+  width: 13px;
+  font-size: 13px;
+  margin-bottom: 2px;
+  vertical-align: middle;
+}
+
+.__subtask + .__subtask{
+  margin-top: 8px;
+}
+
+.__subtask--finished {
+  color: gray;
+  font-style: italic;
+  text-decoration: line-through;
+}

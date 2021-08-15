@@ -29,6 +29,10 @@ import { IonicModule } from '@ionic/angular';
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import { NavigationPanelComponent } from './navigation-panel/navigation-panel.component';
 import { SettingsPageComponent } from './settings-page/settings-page.component';
+import { SplitActivityToSubtasksFormComponent } from './split-activity-to-subtasks-form/split-activity-to-subtasks-form.component';
+import {MatCardModule} from "@angular/material/card";
+import { SpacerComponent } from './spacer/spacer.component';
+import {MatExpansionModule} from "@angular/material/expansion";
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -52,9 +56,12 @@ export class MyHammerConfig extends HammerGestureConfig {
     HeaderComponent,
     ScoreNotFromListModalComponent,
     NavigationPanelComponent,
-    SettingsPageComponent
+    SettingsPageComponent,
+    SplitActivityToSubtasksFormComponent,
+    SpacerComponent
   ],
   imports: [
+    MatCardModule,
     MatSnackBarModule,
     MatTabsModule,
     MatCheckboxModule,

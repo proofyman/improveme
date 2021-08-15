@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ISubtask} from "../activities.service";
 
 @Component({
   selector: 'app-activity-list-item',
@@ -14,11 +15,15 @@ export class ActivityListItemComponent implements OnInit {
   isEditMode!: boolean;
   @Input()
   isDoneToday = false;
+  @Input()
+  subtasks!: ISubtask[];
 
   @Output()
   remove = new EventEmitter<void>();
   @Output()
   score = new EventEmitter<void>();
+  @Output()
+  onFinishSubtask = new EventEmitter<ISubtask>();
 
   constructor() { }
 

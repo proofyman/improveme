@@ -1,0 +1,66 @@
+<h4 class="__heading">{{activity.name}}</h4>
+
+<form (submit)="saveChanges()">
+  <ng-container *ngFor="let subtask of form.controls; last as isLast; index as index">
+    <mat-card>
+      <button
+        *ngIf="form.length > 2"
+        (click)="deleteSubtask(index)"
+        type="button"
+        color="basic"
+        class="__delete-btn"
+        mat-icon-button>
+        <mat-icon>delete</mat-icon>
+      </button>
+
+      <mat-form-field>
+        <mat-label>Название</mat-label>
+        <input
+          matInput
+          [formControl]="$any(subtask).controls.name"
+          type="text">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Очков за задание</mat-label>
+        <input
+          matInput
+          [formControl]="$any(subtask).controls.points"
+          type="number">
+      </mat-form-field>
+    </mat-card>
+
+    <app-spacer
+      *ngIf="!isLast"
+      small>
+    </app-spacer>
+  </ng-container>
+
+  <app-spacer small></app-spacer>
+
+  <div>
+    <button
+      type="button"
+      (click)="addControl()"
+      mat-raised-button>
+      Добавить подзадачу
+    </button>
+  </div>
+
+  <app-spacer large></app-spacer>
+
+  <div>
+    <button
+      type="button"
+      (click)="navigateBack()"
+      mat-raised-button>
+      Назад
+    </button>
+
+    <button
+      color="primary"
+      mat-raised-button>
+      Сохранить
+    </button>
+  </div>
+</form>

@@ -9,15 +9,18 @@
       type="text">
   </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Очков за задание</mat-label>
-    <input
-      matInput
-      [formControl]="$any(form.controls.points)"
-      type="number">
-  </mat-form-field>
+  <ng-container *ngIf="activity?.subtasks?.length === null; else editActivityWithSubtasks">
+    <mat-form-field>
+      <mat-label>Очков за задание</mat-label>
+      <input
+        matInput
+        [formControl]="$any(form.controls.points)"
+        type="number">
+    </mat-form-field>
 
-  <mat-checkbox color="primary" [formControl]="$any(form.controls.isOneTime)">Нерегулярное</mat-checkbox>
+    <mat-checkbox color="primary" [formControl]="$any(form.controls.isOneTime)">Нерегулярное</mat-checkbox>
+  </ng-container>
+
 
   <div class="__form-btns">
     <button
@@ -29,3 +32,15 @@
     <button color="primary" mat-raised-button>{{saveBtnText}}</button>
   </div>
 </form>
+
+<ng-template #editActivityWithSubtasks>
+  <div class="__info-text">
+    У активностей с подзадачами можно редактировать только имя.
+    <br>
+    <br>
+    Изменение подзадач необходимо производить по нажатию кнопки
+    <a [routerLink]="['/activities', activity.name, 'split']">Разделение на подзадачи</a>
+    .
+  </div>
+  <app-spacer small></app-spacer>
+</ng-template>
