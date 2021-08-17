@@ -18,7 +18,7 @@ export class ActivityListItemComponent implements OnInit {
   @Input()
   subtasks!: ISubtask[];
   @Input()
-  isReadonly!: boolean;
+  isReadonly: boolean = false;
 
   @Output()
   remove = new EventEmitter<void>();
@@ -28,7 +28,7 @@ export class ActivityListItemComponent implements OnInit {
   onFinishSubtask = new EventEmitter<ISubtask>();
 
   get isShortForm () {
-    return this.isReadonly || this.subtasks?.length === null
+    return this.isReadonly || (this.subtasks?.length ?? 0) < 2;
   }
 
   constructor() { }
