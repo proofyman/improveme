@@ -17,6 +17,8 @@ export class ActivityListItemComponent implements OnInit {
   isDoneToday = false;
   @Input()
   subtasks!: ISubtask[];
+  @Input()
+  isReadonly!: boolean;
 
   @Output()
   remove = new EventEmitter<void>();
@@ -24,6 +26,10 @@ export class ActivityListItemComponent implements OnInit {
   score = new EventEmitter<void>();
   @Output()
   onFinishSubtask = new EventEmitter<ISubtask>();
+
+  get isShortForm () {
+    return this.isReadonly || this.subtasks?.length === null
+  }
 
   constructor() { }
 

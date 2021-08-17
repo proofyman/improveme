@@ -71,12 +71,13 @@ export class ActivityListComponent implements OnInit {
     });
   }
 
-  deleteActivity(activity: IActivity) {
-    this.modalsService.yesNoModal('Точно удалить ?')
-      .then(() => {
-        this.activitiesService.deleteActivity(activity);
-      })
-      .catch(); // Нажатие кнопки "NO"
+  hideActivity(activity: IActivity) {
+    this.activitiesService.hideActivity(activity);
+    this.snackbar.open(`Активность спрятана`, 'Отменить', {
+      duration: 2000
+    }).onAction().subscribe(() => {
+      this.activitiesService.restoreActivity(activity);
+    });
   }
 
   scoreActivity(activity: IActivity, subtask?: ISubtask) {

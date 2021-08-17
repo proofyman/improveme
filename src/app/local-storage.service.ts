@@ -11,6 +11,10 @@ export class LocalStorageService {
     return JSON.parse(localStorage.getItem(id) || 'null');
   }
 
+  getRawData(id: string) {
+    return localStorage.getItem(id);
+  }
+
   saveData(id: string, data: any) {
     localStorage.setItem(id, JSON.stringify(data));
   }

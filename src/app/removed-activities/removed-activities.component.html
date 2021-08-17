@@ -1,0 +1,45 @@
+<div
+  style="visibility: hidden; position: fixed"
+  [style.left]="contextMenuPosition.x"
+  [style.top]="contextMenuPosition.y"
+  #itemMenuTrigger
+  [matMenuTriggerFor]="itemMenu"
+  class="__item-mat-menu-trigger"></div>
+
+<ng-container
+  *ngIf="hiddenActivities$ | async; let activities">
+  <ng-container *ngIf="activities.length; else zeroState">
+    <h4 class="__heading">Скрытые активности</h4>
+
+    <app-activity-list-item
+      *ngFor="let activity of activities; trackBy: trackByName"
+      (press)="openContextMenu($event, activity)"
+      [name]="activity.name"
+      [isReadonly]="true"
+    >
+    </app-activity-list-item>
+  </ng-container>
+</ng-container>
+
+<mat-menu #itemMenu="matMenu">
+  <ng-template matMenuContent let-activity="activity">
+    <button
+      (click)="restoreActivity(activity)"
+      mat-menu-item>
+      Восстановить
+    </button>
+
+    <button
+      (click)="deleteActivity(activity)"
+      mat-menu-item>
+      Удалить
+    </button>
+
+  </ng-template>
+</mat-menu>
+
+<ng-template #zeroState>
+  <div class="__zero-state">
+    Нету скрытых активностей.
+  </div>
+</ng-template>

@@ -5,6 +5,7 @@ import {CreateActivityShortFormComponent} from "./create-activity-short-form/cre
 import {ActivityHistoryComponent} from "./activity-history/activity-history.component";
 import {SettingsPageComponent} from "./settings-page/settings-page.component";
 import {SplitActivityToSubtasksFormComponent} from "./split-activity-to-subtasks-form/split-activity-to-subtasks-form.component";
+import {RemovedActivitiesComponent} from "./removed-activities/removed-activities.component";
 
 const routes: Routes = [
   {
@@ -32,6 +33,10 @@ const routes: Routes = [
   {
     path: 'settings',
     component: SettingsPageComponent
+  },
+  {
+    path: 'removed-activities',
+    component: RemovedActivitiesComponent
   }
 ];
 

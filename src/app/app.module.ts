@@ -33,6 +33,7 @@ import { SplitActivityToSubtasksFormComponent } from './split-activity-to-subtas
 import {MatCardModule} from "@angular/material/card";
 import { SpacerComponent } from './spacer/spacer.component';
 import {MatExpansionModule} from "@angular/material/expansion";
+import { RemovedActivitiesComponent } from './removed-activities/removed-activities.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -58,7 +59,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     NavigationPanelComponent,
     SettingsPageComponent,
     SplitActivityToSubtasksFormComponent,
-    SpacerComponent
+    SpacerComponent,
+    RemovedActivitiesComponent
   ],
   imports: [
     MatCardModule,

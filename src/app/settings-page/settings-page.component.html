@@ -7,3 +7,22 @@
     Очистить результат за день
   </button>
 </div>
+
+<app-spacer large></app-spacer>
+
+<h4 class="__heading">Импорт\экспорт</h4>
+
+<div>
+  <button
+    (click)="exportData()"
+    mat-raised-button>
+    Экспорт
+  </button>
+
+  <button
+    (click)="importData()"
+    mat-raised-button>
+    Импортировать из файла
+  </button>
+
+</div>

@@ -9,6 +9,28 @@
   <span class="__btn-description">Главная</span>
 </span>
 
+<!--<span-->
+<!--  [routerLink]="'/scoring-history'"-->
+<!--  [routerLinkActive]="'__btn&#45;&#45;active'"-->
+<!--  [routerLinkActiveOptions]="{exact:true}"-->
+<!--  class="__btn">-->
+<!--  <button mat-icon-button>-->
+<!--    <mat-icon>bookmarks</mat-icon>-->
+<!--  </button>-->
+<!--  <span class="__btn-description">Категории</span>-->
+<!--</span>-->
+
+<span
+  [routerLink]="'/removed-activities'"
+  [routerLinkActive]="'__btn--active'"
+  [routerLinkActiveOptions]="{exact:true}"
+  class="__btn">
+  <button mat-icon-button>
+    <mat-icon>inventory_2</mat-icon>
+  </button>
+  <span class="__btn-description">Скрытые</span>
+</span>
+
 <span
   [routerLink]="'/scoring-history'"
   [routerLinkActive]="'__btn--active'"
