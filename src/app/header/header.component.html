@@ -1,8 +1,18 @@
-<div
-  (click)="toMainScreen()"
-  class="__logo">
-  Improveme!
+<!--<div-->
+<!--  (click)="toMainScreen()"-->
+<!--  class="__logo">-->
+<!--  Improveme!-->
+<!--</div>-->
+<div class="__current-page">{{currentPageName$ | async}}</div>
+
+<div class="__actions">
+  <ng-template [cdkPortalOutlet]="activePortal$ | async">
+
+  </ng-template>
+
+  <router-outlet name="Tarara"></router-outlet>
 </div>
+
 
 <div
   (click)="toScoringHistory()"

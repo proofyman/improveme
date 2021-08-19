@@ -4,8 +4,10 @@ import {
   shouldScoreToday
 } from "../activities.service";
 import {combineLatest, interval, Observable} from "rxjs";
-import {map, startWith} from "rxjs/operators";
+import {map, startWith, tap} from "rxjs/operators";
 import {RoutingService} from "../routing.service";
+import {TemplatePortal} from "@angular/cdk/portal";
+import {PortalService} from "../portal.service";
 
 @Component({
   selector: 'app-header',
@@ -14,13 +16,21 @@ import {RoutingService} from "../routing.service";
 })
 export class HeaderComponent implements OnInit {
   todayScore$!: Observable<number>;
+  activePortal$!: Observable<TemplatePortal | null>;
+  currentPageName$!: Observable<string>;
 
   constructor(
     private activitiesService: ActivitiesService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private portalService: PortalService
   ) { }
 
   ngOnInit(): void {
+    this.activePortal$ = this.portalService.getActivePortal();
+    this.currentPageName$ = this.routingService.getDataObservable().pipe(
+      map(data => data.name)
+    );
+
     this.todayScore$ =
       combineLatest([
         this.activitiesService.getActivityRecords(),

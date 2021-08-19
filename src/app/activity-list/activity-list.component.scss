@@ -1,3 +1,5 @@
+@import "~src/variables";
+
 :host {
   display: flex;
   flex: 1;
@@ -12,4 +14,34 @@
 .__zero-state {
   padding: 16px 0;
   font-size: 14px;
+}
+
+:host ::ng-deep mat-tab-header {
+  display: none;
+}
+
+.__tab-heading {
+  border-bottom: solid 1px $borderColor;
+  padding-bottom: 8px;
+}
+
+.__tab-link {
+  display: inline-block;
+  font-size: 14px;
+  padding: 4px 8px;
+  border: solid 2px #673ab7;
+  border-radius: 16px;
+  color: #673ab7;
+  margin-bottom: 8px;
+  min-width: 72px;
+  text-align: center;
+  margin-right: 8px;
+}
+
+.__tab-link:last-child {
+  margin-right: 0;
+}
+
+.__tab-link--current {
+  background: #d9d3f0;
 }

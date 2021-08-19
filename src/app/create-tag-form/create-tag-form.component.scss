@@ -1,0 +1,17 @@
+.__form {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.__form-btns {
+  margin-top: 16px;
+}
+
+button + button {
+  margin-left: 8px;
+}
+
+.__info-text {
+  font-size: 12px;
+}

@@ -6,37 +6,66 @@ import {ActivityHistoryComponent} from "./activity-history/activity-history.comp
 import {SettingsPageComponent} from "./settings-page/settings-page.component";
 import {SplitActivityToSubtasksFormComponent} from "./split-activity-to-subtasks-form/split-activity-to-subtasks-form.component";
 import {RemovedActivitiesComponent} from "./removed-activities/removed-activities.component";
+import {CreateTagFormComponent} from "./create-tag-form/create-tag-form.component";
 
 const routes: Routes = [
   {
     path: '',
-    component: MainPageComponent
+    component: MainPageComponent,
+    data: {
+      name: 'Главная'
+    }
   },
   {
     path: 'create-activity',
-    component: CreateActivityShortFormComponent
+    component: CreateActivityShortFormComponent,
+    data: {
+      name: 'Добавить активность'
+    }
+  },
+  {
+    path: 'create-tag',
+    component: CreateTagFormComponent,
+    data: {
+      name: 'Добавить категорию'
+    }
   },
   {
     path: 'activities/:name',
     component: CreateActivityShortFormComponent,
     children: [
-    ]
+    ],
+    data: {
+      name: 'Редактирование'
+    }
   },
   {
     path: 'activities/:name/split',
-    component: SplitActivityToSubtasksFormComponent
+    component: SplitActivityToSubtasksFormComponent,
+    data: {
+      name: 'Подзадачи'
+    }
   },
   {
     path: 'scoring-history',
-    component: ActivityHistoryComponent
+    component: ActivityHistoryComponent,
+    data: {
+      name: 'История'
+    }
   },
   {
     path: 'settings',
-    component: SettingsPageComponent
+    component: SettingsPageComponent,
+    data: {
+      name: 'Настройки'
+    }
   },
   {
     path: 'removed-activities',
-    component: RemovedActivitiesComponent
+    component: RemovedActivitiesComponent,
+    data: {
+      name: 'Скрытые'
+    }
   }
 ];
 

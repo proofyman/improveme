@@ -1,10 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivitiesService, IActivity} from "../activities.service";
 import {RoutingService} from "../routing.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
-import {Subject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
+import {Observable, Subject} from "rxjs";
+import {takeUntil, tap} from "rxjs/operators";
+import {ITag, TagsService} from "../tags.service";
+import {some} from "lodash-es";
+
+
+function tagExistValidator (tags: ITag[]) {
+  return function (control: AbstractControl) {
+    return some(tags, tag => tag.name === control.value) ? null : {tagError: 'error'};
+  };
+}
 
 @Component({
   selector: 'app-create-activity-short-form',
@@ -16,12 +25,15 @@ export class CreateActivityShortFormComponent implements OnInit {
   isEditMode = false;
   editedActivityOldName = '';
   destroy$ = new Subject<void>();
+  tags$!: Observable<ITag[]>;
   activity!: IActivity;
+  currentTags!: ITag[];
 
   constructor(
     private activitiesService: ActivitiesService,
     private routingService: RoutingService,
     private formBuilder: FormBuilder,
+    private tagsService: TagsService,
     private activatedRoute: ActivatedRoute
   ) { }
 
@@ -30,7 +42,10 @@ export class CreateActivityShortFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.tags$ = this.tagsService.getTags();
+
     this.form = this.formBuilder.group({
+      tag: [''],
       name: ['', [Validators.required, Validators.minLength(3)]],
       points: [null, Validators.required],
       subtasks: [null],
@@ -46,6 +61,13 @@ export class CreateActivityShortFormComponent implements OnInit {
         this.editedActivityOldName = this.activity.name;
         this.form.patchValue(this.activity);
       }
+    });
+
+    this.tags$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(tags => {
+      this.currentTags = tags;
+      this.form.get('tag')?.setValidators(tagExistValidator(tags));
     });
   }
 

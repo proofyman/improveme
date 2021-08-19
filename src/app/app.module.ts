@@ -32,8 +32,11 @@ import { SettingsPageComponent } from './settings-page/settings-page.component';
 import { SplitActivityToSubtasksFormComponent } from './split-activity-to-subtasks-form/split-activity-to-subtasks-form.component';
 import {MatCardModule} from "@angular/material/card";
 import { SpacerComponent } from './spacer/spacer.component';
-import {MatExpansionModule} from "@angular/material/expansion";
 import { RemovedActivitiesComponent } from './removed-activities/removed-activities.component';
+import {PortalModule} from "@angular/cdk/portal";
+import { CreateTagFormComponent } from './create-tag-form/create-tag-form.component';
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import {MatOptionModule} from "@angular/material/core";
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -60,9 +63,13 @@ export class MyHammerConfig extends HammerGestureConfig {
     SettingsPageComponent,
     SplitActivityToSubtasksFormComponent,
     SpacerComponent,
-    RemovedActivitiesComponent
+    RemovedActivitiesComponent,
+    CreateTagFormComponent
   ],
   imports: [
+    MatOptionModule,
+    MatAutocompleteModule,
+    PortalModule,
     MatCardModule,
     MatSnackBarModule,
     MatTabsModule,

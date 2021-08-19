@@ -18,6 +18,21 @@
         type="number">
     </mat-form-field>
 
+    <mat-form-field *ngIf="currentTags.length">
+      <mat-label>Категория</mat-label>
+      <input type="text"
+             matInput
+             [formControl]="$any(form).get('tag')"
+             [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option
+          *ngFor="let tag of currentTags"
+          [value]="tag.name">
+          {{tag.name}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
     <mat-checkbox color="primary" [formControl]="$any(form.controls.isOneTime)">Нерегулярное</mat-checkbox>
   </ng-container>
 

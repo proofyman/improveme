@@ -53,6 +53,7 @@ export interface ISubtask {
 
 export interface IActivity {
   id?: number;
+  tag?: string; // тоже самое, что name в ITag
   name: string;
   points: number;
   isOneTime: boolean;

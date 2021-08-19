@@ -1,18 +1,61 @@
 <ng-container *ngIf="activities$ | async; let activities">
-    <div class="__list-header">
-      <a [routerLink]="['/create-activity']">Добавить активность</a>
-      <button mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon>more_horiz</mat-icon>
+
+    <ng-template
+      #actionsPortal
+      cdkPortal>
+      <button
+        [routerLink]="['/create-activity']"
+        color="primary"
+        mat-icon-button>
+        <mat-icon>add</mat-icon>
       </button>
-    </div>
+
+      <button
+        color="primary"
+        (click)="openScoreNotFromListModal()"
+        mat-icon-button>
+        <mat-icon>check</mat-icon>
+      </button>
+
+      <button
+        [routerLink]="['/create-tag']"
+        color="primary"
+        mat-icon-button>
+        <mat-icon>bookmark_outline</mat-icon>
+      </button>
+    </ng-template>
 
     <mat-menu #menu="matMenu">
       <button
-        (click)="openScoreNotFromListModal()"
         mat-menu-item>
         Засчитать не из списка
       </button>
     </mat-menu>
+
+    <div class="__tab-heading">
+      <div
+        (click)="changeTabTo(TAB_INDEXES.COMMON)"
+        [class.__tab-link--current]="selectedTabIndex === TAB_INDEXES.COMMON && !tagFilter$.value"
+        class="__tab-link">
+        Основные
+      </div>
+
+      <div
+        [class.__tab-link--current]="selectedTabIndex === TAB_INDEXES.ONETIME"
+        (click)="changeTabTo(TAB_INDEXES.ONETIME)"
+        class="__tab-link">
+        Разовые
+      </div>
+
+      <div
+        *ngFor="let tag of tags$ | async"
+        [class.__tab-link--current]="tagFilter$.value === tag.name"
+        (click)="filterActivitiesByTag(tag)"
+        class="__tab-link">
+        {{tag.name}}
+      </div>
+
+    </div>
 
     <div
       style="visibility: hidden; position: fixed"
@@ -24,7 +67,7 @@
 
     <div class="__container">
       <mat-tab-group [(selectedIndex)]="selectedTabIndex">
-        <mat-tab label="Регулярные">
+        <mat-tab>
           <ng-container *ngIf="activities.length; else zeroState">
             <app-activity-list-item
               *ngFor="let activity of activities$ | async; trackBy: trackByName"
@@ -38,7 +81,7 @@
             </app-activity-list-item>
           </ng-container>
         </mat-tab>
-        <mat-tab label="Единоразовые">
+        <mat-tab>
           <ng-container *ngIf="oneTimeActivities$ | async; let oneTimeActivities">
             <ng-container *ngIf="oneTimeActivities.length; else zeroState">
               <app-activity-list-item
@@ -55,7 +98,6 @@
               </app-activity-list-item>
             </ng-container>
           </ng-container>
-
         </mat-tab>
       </mat-tab-group>
     </div>

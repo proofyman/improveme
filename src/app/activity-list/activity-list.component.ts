@@ -1,5 +1,5 @@
-import {Component, HostBinding, HostListener, OnInit, ViewChild} from '@angular/core';
-import {combineLatest, interval, Observable} from "rxjs";
+import {AfterViewInit, Component, HostBinding, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, combineLatest, interval, Observable} from "rxjs";
 import {
   ActivitiesService,
   getDateNormalizedToHumanCycle,
@@ -14,16 +14,25 @@ import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score
 import {MatMenuTrigger} from "@angular/material/menu";
 import {RoutingService} from "../routing.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {act} from "@ngrx/effects";
+import {PortalService} from "../portal.service";
+import {CdkPortal, TemplatePortal} from "@angular/cdk/portal";
+import {ITag, TagsService} from "../tags.service";
+
+enum TAB_INDEXES {
+  COMMON = 0,
+  ONETIME = 1
+}
 
 @Component({
   selector: 'app-activity-list',
   templateUrl: './activity-list.component.html',
   styleUrls: ['./activity-list.component.scss']
 })
-export class ActivityListComponent implements OnInit {
+export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('itemMenuTrigger', {read: MatMenuTrigger})
   trigger!: MatMenuTrigger;
+  @ViewChild('actionsPortal', {read: CdkPortal})
+  actionsPortal!: TemplatePortal;
 
   contextMenuPosition = { x: '0px', y: '0px' };
   activities$!: Observable<any>;
@@ -33,15 +42,22 @@ export class ActivityListComponent implements OnInit {
   isEditMode = false;
   isRegularListView = true;
   selectedTabIndex: number = 0;
+  TAB_INDEXES = TAB_INDEXES;
+  tagFilter$ = new BehaviorSubject<string>('');
+  tags$!: Observable<ITag[]>;
 
   constructor(
     private activitiesService: ActivitiesService,
     private routingService: RoutingService,
     private modalsService: ModalsService,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private portalService: PortalService,
+    private tagsService: TagsService
   ) {}
 
   ngOnInit(): void {
+    this.tags$ = this.tagsService.getTags();
+
     this.todayActivities$ = this.activitiesService.getActivityRecords().pipe(
       map(ars => {
         let records = ars
@@ -55,10 +71,15 @@ export class ActivityListComponent implements OnInit {
         map(activities => activities.filter(a => !a.isOneTime))
       ),
       this.todayActivities$,
+      this.tagFilter$,
       interval(5000).pipe(startWith(0)) // просто обновляем список каждые 5 сек, это вид проверки на конец дня
     ]).pipe(
-      map(([activities, todayArs]) => {
-        return sortBy(activities, a => todayArs.includes(a.name))
+      map(([activities, todayArs, tagFilter]) => {
+        let filteredActivities = activities;
+        if (tagFilter !== '') {
+          filteredActivities = activities.filter(a => a.tag === tagFilter);
+        }
+        return sortBy(filteredActivities, a => todayArs.includes(a.name))
       })
     );
 
@@ -69,6 +90,15 @@ export class ActivityListComponent implements OnInit {
     this.todayActivities$.subscribe(todayArNames => {
       this.todayArNames = todayArNames;
     });
+
+  }
+
+  ngAfterViewInit() {
+    this.portalService.setActivePortal(this.actionsPortal);
+  }
+
+  ngOnDestroy() {
+    this.portalService.setActivePortal(null);
   }
 
   hideActivity(activity: IActivity) {
@@ -174,5 +204,20 @@ export class ActivityListComponent implements OnInit {
     if (every(activity.subtasks, s => s.isFinished)) {
       this.activitiesService.deleteActivity(activity);
     }
+  }
+
+  changeTabTo(tabIndex: number) {
+    this.filterActivitiesByTag(null);
+    this.selectedTabIndex = tabIndex;
+  }
+
+  filterActivitiesByTag(tag: ITag | null) {
+    this.selectedTabIndex = TAB_INDEXES.COMMON;
+    if (!tag) {
+      this.tagFilter$.next('');
+      return;
+    }
+
+    this.tagFilter$.next(tag.name);
   }
 }

@@ -1,0 +1,21 @@
+<form
+  class="__form"
+  (ngSubmit)="addTag()">
+  <mat-form-field>
+    <mat-label>Название</mat-label>
+    <input
+      matInput
+      [formControl]="$any(form.get('name'))"
+      type="text">
+  </mat-form-field>
+
+  <div class="__form-btns">
+    <button
+      (click)="navigateBack()"
+      type="button"
+      mat-raised-button>
+      Назад
+    </button>
+    <button color="primary" mat-raised-button>{{saveBtnText}}</button>
+  </div>
+</form>

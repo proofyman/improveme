@@ -1,12 +1,14 @@
+@import "~src/variables";
+
 :host {
   display: flex;
   padding: 16px;
-  justify-content: space-between;
-  background-color: #bcb4db;
+  background: $menuColor;
+  border-bottom: solid 1px #bcb4db;
+  align-items: center;
 }
 
-.__logo {
-  font-size: 20px;
+.__current-page {
   font-weight: 500;
 }
 
@@ -15,4 +17,11 @@
   align-items: center;
   font-size: 20px;
   font-weight: 500;
+}
+
+.__actions {
+  margin-left: auto;
+  margin-right: 16px;
+  margin-top: -8px;
+  margin-bottom: -8px;
 }
