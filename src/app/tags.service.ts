@@ -31,4 +31,23 @@ export class TagsService {
   getTags(): Observable<ITag[]> {
     return this.tags$.asObservable();
   }
+
+  deleteTag(tag: ITag) {
+    this.tags = this.tags.filter(t => t.name !== tag.name);
+    this.localStorageService.saveData(TAGS_ID_KEY, this.tags);
+    this.tags$.next(this.tags);
+  }
+
+  getTag(name: string): ITag {
+    return this.tags.filter(a => a.name === name)[0];
+  }
+
+  updateTag(tagName: string, tag: ITag) {
+    let tagIndex = this.tags.findIndex(a => a.name === tagName);
+    this.tags.splice(tagIndex, 1);
+    this.tags.splice(tagIndex, 0, tag);
+    this.tags = [...this.tags];
+    this.localStorageService.saveData(TAGS_ID_KEY, this.tags)
+    this.tags$.next(this.tags);
+  }
 }

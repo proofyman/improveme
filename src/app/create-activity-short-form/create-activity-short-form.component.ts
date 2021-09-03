@@ -4,14 +4,14 @@ import {RoutingService} from "../routing.service";
 import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
 import {Observable, Subject} from "rxjs";
-import {takeUntil, tap} from "rxjs/operators";
+import {takeUntil} from "rxjs/operators";
 import {ITag, TagsService} from "../tags.service";
 import {some} from "lodash-es";
 
 
 function tagExistValidator (tags: ITag[]) {
   return function (control: AbstractControl) {
-    return some(tags, tag => tag.name === control.value) ? null : {tagError: 'error'};
+    return !control.value || some(tags, tag => tag.name === control.value) ? null : {tagError: 'error'};
   };
 }
 

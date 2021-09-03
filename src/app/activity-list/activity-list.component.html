@@ -25,13 +25,6 @@
       </button>
     </ng-template>
 
-    <mat-menu #menu="matMenu">
-      <button
-        mat-menu-item>
-        Засчитать не из списка
-      </button>
-    </mat-menu>
-
     <div class="__tab-heading">
       <div
         (click)="changeTabTo(TAB_INDEXES.COMMON)"
@@ -50,6 +43,7 @@
       <div
         *ngFor="let tag of tags$ | async"
         [class.__tab-link--current]="tagFilter$.value === tag.name"
+        (press)="openContextTagMenu($event, tag)"
         (click)="filterActivitiesByTag(tag)"
         class="__tab-link">
         {{tag.name}}
@@ -63,6 +57,14 @@
       [style.top]="contextMenuPosition.y"
       #itemMenuTrigger
       [matMenuTriggerFor]="itemMenu"
+      class="__item-mat-menu-trigger"></div>
+
+    <div
+      style="visibility: hidden; position: fixed"
+      [style.left]="contextMenuPosition.x"
+      [style.top]="contextMenuPosition.y"
+      #tagMenuTrigger
+      [matMenuTriggerFor]="tagMenu"
       class="__item-mat-menu-trigger"></div>
 
     <div class="__container">
@@ -123,6 +125,22 @@
       (click)="splitToSubtasks(activity)"
       *ngIf="activity.isOneTime">
       Разбить на подзадачи
+    </button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #tagMenu="matMenu">
+  <ng-template matMenuContent let-tag="tag">
+    <button
+      (click)="editTag(tag)"
+      mat-menu-item>
+      Редактировать
+    </button>
+
+    <button
+      (click)="deleteTag(tag)"
+      mat-menu-item>
+      Удалить
     </button>
   </ng-template>
 </mat-menu>

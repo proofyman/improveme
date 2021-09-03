@@ -31,6 +31,13 @@ const routes: Routes = [
     }
   },
   {
+    path: 'tags/:name',
+    component: CreateTagFormComponent,
+    data: {
+      name: 'Редактирование'
+    }
+  },
+  {
     path: 'activities/:name',
     component: CreateActivityShortFormComponent,
     children: [

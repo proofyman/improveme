@@ -31,6 +31,8 @@ enum TAB_INDEXES {
 export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('itemMenuTrigger', {read: MatMenuTrigger})
   trigger!: MatMenuTrigger;
+  @ViewChild('tagMenuTrigger', {read: MatMenuTrigger})
+  tagMenuTrigger!: MatMenuTrigger;
   @ViewChild('actionsPortal', {read: CdkPortal})
   actionsPortal!: TemplatePortal;
 
@@ -58,8 +60,11 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.tags$ = this.tagsService.getTags();
 
-    this.todayActivities$ = this.activitiesService.getActivityRecords().pipe(
-      map(ars => {
+    this.todayActivities$ = combineLatest(
+      this.activitiesService.getActivityRecords(),
+      interval(1000).pipe(startWith(0)) // просто обновляем список каждую секунду, это вид проверки на конец дня
+    ).pipe(
+      map(([ars]) => {
         let records = ars
           .slice(0, 200) // костыль, чтобы не анализировать всю историю
           .filter(ar => shouldScoreToday(ar.timestamp));
@@ -71,8 +76,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
         map(activities => activities.filter(a => !a.isOneTime))
       ),
       this.todayActivities$,
-      this.tagFilter$,
-      interval(5000).pipe(startWith(0)) // просто обновляем список каждые 5 сек, это вид проверки на конец дня
+      this.tagFilter$
     ]).pipe(
       map(([activities, todayArs, tagFilter]) => {
         let filteredActivities = activities;
@@ -183,6 +187,16 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 350);
   }
 
+  openContextTagMenu(event: any, tag: ITag) {
+    setTimeout(() => {
+      window.navigator.vibrate(50)
+      this.contextMenuPosition.x = Math.max(20, event.center.x - 120) + 'px';
+      this.contextMenuPosition.y = event.center.y + 20 + 'px';
+      this.tagMenuTrigger.menuData = {tag: tag};
+      this.tagMenuTrigger.openMenu();
+    }, 350);
+  }
+
   editActivity(activity: IActivity) {
     this.routingService.navigate(`activities/${activity.name}`);
   }
@@ -219,5 +233,18 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.tagFilter$.next(tag.name);
+  }
+
+  editTag(tag: ITag) {
+    this.routingService.navigate(`/tags/${tag.name}`);
+  }
+
+  deleteTag(tag: ITag) {
+    this.tagsService.deleteTag(tag);
+    this.snackbar.open(`Удалена категория "${tag.name}"`, 'Отменить', {
+      duration: 2000
+    }).onAction().subscribe(() => {
+      this.tagsService.addTag(tag);
+    });
   }
 }
