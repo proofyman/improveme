@@ -45,7 +45,7 @@
         [class.__tab-link--current]="tagFilter$.value === tag.name"
         (press)="openContextTagMenu($event, tag)"
         (click)="filterActivitiesByTag(tag)"
-        class="__tab-link">
+        class="__tab-link __tab-link--{{tag.color}}">
         {{tag.name}}
       </div>
 

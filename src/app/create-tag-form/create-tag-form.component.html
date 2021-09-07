@@ -9,6 +9,24 @@
       type="text">
   </mat-form-field>
 
+  <mat-form-field>
+    <mat-label>Цвет</mat-label>
+    <input type="text"
+           matInput
+           [formControl]="$any(form).get('color')"
+           [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option
+        *ngFor="let color of colors"
+        [value]="color.name">
+        <div class="__color-option">
+          {{color.name}}
+          <div class="__color __color--{{color.id}}"></div>
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
   <div class="__form-btns">
     <button
       (click)="navigateBack()"

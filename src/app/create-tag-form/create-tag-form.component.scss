@@ -1,3 +1,5 @@
+@import "~src/variables";
+
 .__form {
   display: flex;
   flex-direction: column;
@@ -14,4 +16,40 @@ button + button {
 
 .__info-text {
   font-size: 12px;
+}
+
+.__color {
+  height: 32px;
+  width: 32px;
+  border-radius: 32px;
+}
+
+.__color--RED {
+  background: $redColor;
+}
+
+.__color--GREEN {
+  background: $greenColor;
+}
+
+.__color--ORANGE {
+  background: $orangeColor;
+}
+
+.__color--LIGHT_BLUE {
+  background: $lightBlueColor;
+}
+
+.__color--BLUE {
+  background: $blueColor;
+}
+
+.__color--PURPLE {
+  background: $purpleColor;
+}
+
+.__color-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

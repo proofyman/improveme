@@ -2,8 +2,18 @@ import {Injectable} from '@angular/core';
 import {LocalStorageService} from "./local-storage.service";
 import {BehaviorSubject, Observable} from "rxjs";
 
+export enum TagColor {
+  RED = 'RED',
+  BLUE = 'BLUE',
+  ORANGE = 'ORANGE',
+  LIGHT_BLUE = 'LIGHT_BLUE',
+  GREEN = 'GREEN',
+  PURPLE = 'PURPLE'
+}
+
 export interface ITag {
   name: string;
+  color?: TagColor;
 }
 
 const TAGS_ID_KEY = 'TAGS_ID_KEY';

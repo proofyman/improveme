@@ -45,3 +45,51 @@
 .__tab-link--current {
   background: #d9d3f0;
 }
+
+.__tab-link--RED {
+  border: solid 2px #f0464e;
+  color: #f0464e;
+
+  &.__tab-link--current {
+    background: #f0464e26;
+  }
+}
+
+.__tab-link--BLUE {
+  border: solid 2px #487bd9;
+  color: #487bd9;
+  &.__tab-link--current {
+    background: #487bd933;
+  }
+}
+
+.__tab-link--GREEN {
+  border: solid 2px #5fa167;
+  color: #5fa167;
+  &.__tab-link--current {
+    background: #5fa16730;
+  }
+}
+
+.__tab-link--ORANGE {
+  border: solid 2px #ff9000;
+  color: #ae5a10;
+  &.__tab-link--current {
+    background: #ff900030;
+  }
+}
+
+.__tab-link--LIGHT_BLUE {
+  border: solid 2px #4ec6e1;
+  border-radius: 16px;
+  color: #418999;
+  &.__tab-link--current {
+    background: #4ec6e130;
+  }
+}
+
+.__tab-link--PURPLE {
+  border: solid 2px #673ab7;
+  border-radius: 16px;
+  color: #673ab7;
+}
