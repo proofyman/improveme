@@ -301,10 +301,14 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isActivityCanBeHidden(activity: IActivity) {
-    return this.isEditMode && this.isExistActivityTag(activity);
+    return this.isEditMode;
   }
 
   isExistActivityTag(activity: IActivity) {
     return some(this.tags, t => t.name === activity.tag)
+  }
+
+  getActivityColor(activity: IActivity) {
+    return find(this.tags, t => t.name === activity.tag)?.color;
   }
 }

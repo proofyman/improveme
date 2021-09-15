@@ -1,3 +1,5 @@
+@import "~src/variables";
+
 :host:nth-child(even) {
   background: #f1f0f8;
 }
@@ -7,6 +9,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 4px 4px;
+  border-left: solid 2px rgba(0,0,0,0);
 }
 
 :host:active {
@@ -96,4 +99,28 @@
 
 .__checkbox {
   margin-right: 8px;
+}
+
+:host.--RED {
+  border-color: $redColor;
+}
+
+:host.--BLUE {
+  border-color: $blueColor;
+}
+
+:host.--ORANGE {
+  border-color: $orangeColor;
+}
+
+:host.--GREEN {
+  border-color: $greenColor;
+}
+
+:host.--LIGHT_BLUE {
+  border-color: $lightBlueColor;
+}
+
+:host.--PURPLE {
+  border-color: $purpleColor;
 }

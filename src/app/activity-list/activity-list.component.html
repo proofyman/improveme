@@ -28,7 +28,7 @@
           (press)="openContextMainTagMenu($event)"
           [class.__tab-link--current]="selectedTabIndex === TAB_INDEXES.COMMON && !tagFilter$.value"
           class="__tab-link">
-          Основные
+          Все
         </div>
 
         <div
@@ -88,11 +88,12 @@
           <ng-container *ngIf="activities.length; else zeroState">
             <ng-container *ngFor="let activity of activities$ | async; trackBy: trackByName">
               <app-activity-list-item
-                *ngIf="isEditMode || !excludedActivities.has(activity.name) || !isExistActivityTag(activity) || tagFilter$.value"
+                *ngIf="isEditMode || !excludedActivities.has(activity.name) || tagFilter$.value"
                 (press)="openContextMenu($event, activity)"
                 [isDoneToday]="isDoneToday(activity)"
                 [isEditMode]="isEditMode"
                 [name]="activity.name"
+                [color]="getActivityColor(activity)"
                 [points]="activity.points"
                 (score)="scoreActivity(activity)"
                 [isCheckboxVisible]="isActivityCanBeHidden(activity)"

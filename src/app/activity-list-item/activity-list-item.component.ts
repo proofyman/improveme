@@ -1,5 +1,6 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, HostBinding, Input, OnInit, Output} from '@angular/core';
 import {ISubtask} from "../activities.service";
+import {TagColor} from "../tags.service";
 
 @Component({
   selector: 'app-activity-list-item',
@@ -23,6 +24,8 @@ export class ActivityListItemComponent implements OnInit {
   isCheckboxVisible: boolean = false;
   @Input()
   isChecked!: boolean;
+  @Input()
+  color?: TagColor;
 
   @Output()
   remove = new EventEmitter<void>();
@@ -32,6 +35,11 @@ export class ActivityListItemComponent implements OnInit {
   onFinishSubtask = new EventEmitter<ISubtask>();
   @Output()
   checkboxClick = new EventEmitter<void>();
+
+  @HostBinding('class')
+  get hostClass() {
+    return `--${this.color}`;
+  }
 
   get isShortForm () {
     return this.isReadonly || (this.subtasks?.length ?? 0) < 2;

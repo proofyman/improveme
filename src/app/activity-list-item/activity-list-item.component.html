@@ -2,7 +2,7 @@
   <div
     [class.__description--readonly]="isReadonly"
     [class.__description--done-today]="isDoneToday"
-    class="__description">
+    class="__description __marker--{{color}}">
     <mat-checkbox
       *ngIf="isCheckboxVisible"
       (change)="checkboxClick.emit()"
