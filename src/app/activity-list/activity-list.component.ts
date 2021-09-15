@@ -309,6 +309,6 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getActivityColor(activity: IActivity) {
-    return find(this.tags, t => t.name === activity.tag)?.color;
+    return this.tagFilter$.value ? undefined : find(this.tags, t => t.name === activity.tag)?.color;
   }
 }
