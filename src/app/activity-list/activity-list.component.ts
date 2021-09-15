@@ -1,15 +1,14 @@
-import {AfterViewInit, Component, HostBinding, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, combineLatest, interval, Observable} from "rxjs";
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, combineLatest, interval, Observable, Subject} from "rxjs";
 import {
   ActivitiesService,
-  getDateNormalizedToHumanCycle,
   IActivity,
   ISubtask,
   shouldScoreToday
 } from "../activities.service";
 import {ModalsService} from "../modals.service";
-import {map, startWith} from "rxjs/operators";
-import {every, filter, find, sortBy, uniq} from 'lodash-es';
+import {map, startWith, takeUntil} from "rxjs/operators";
+import {every, find, some, uniq} from 'lodash-es';
 import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score-not-from-list-modal.component";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {RoutingService} from "../routing.service";
@@ -17,6 +16,9 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {PortalService} from "../portal.service";
 import {CdkPortal, TemplatePortal} from "@angular/cdk/portal";
 import {ITag, TagsService} from "../tags.service";
+import {LocalStorageService} from "../local-storage.service";
+
+const HIDDEN_LIST_VARIABLE_NAME = 'HIDDEN_LIST';
 
 enum TAB_INDEXES {
   COMMON = 0,
@@ -29,10 +31,15 @@ enum TAB_INDEXES {
   styleUrls: ['./activity-list.component.scss']
 })
 export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input()
+  isOneTimeMode = false;
+
   @ViewChild('itemMenuTrigger', {read: MatMenuTrigger})
   trigger!: MatMenuTrigger;
   @ViewChild('tagMenuTrigger', {read: MatMenuTrigger})
   tagMenuTrigger!: MatMenuTrigger;
+  @ViewChild('mainTagMenuTrigger', {read: MatMenuTrigger})
+  mainTagMenuTrigger!: MatMenuTrigger;
   @ViewChild('actionsPortal', {read: CdkPortal})
   actionsPortal!: TemplatePortal;
 
@@ -43,13 +50,17 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   todayArNames: string[] = [];
   isEditMode = false;
   isRegularListView = true;
+  tags!: ITag[];
   selectedTabIndex: number = 0;
   TAB_INDEXES = TAB_INDEXES;
   tagFilter$ = new BehaviorSubject<string>('');
   tags$!: Observable<ITag[]>;
+  excludedActivities = new Set<string>();
+  destroy$ = new Subject<void>();
 
   constructor(
     private activitiesService: ActivitiesService,
+    private localStorageService: LocalStorageService,
     private routingService: RoutingService,
     private modalsService: ModalsService,
     private snackbar: MatSnackBar,
@@ -58,7 +69,17 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.excludedActivities = new Set(
+      this.localStorageService.getData(HIDDEN_LIST_VARIABLE_NAME) || []
+    );
+
     this.tags$ = this.tagsService.getTags();
+    this.tags$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(tags => {
+      this.tags = tags
+    });
+    this.selectedTabIndex = this.isOneTimeMode ? TAB_INDEXES.ONETIME : TAB_INDEXES.COMMON;
 
     this.todayActivities$ = combineLatest(
       this.activitiesService.getActivityRecords(),
@@ -83,7 +104,9 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (tagFilter !== '') {
           filteredActivities = activities.filter(a => a.tag === tagFilter);
         }
-        return sortBy(filteredActivities, a => todayArs.includes(a.name))
+
+        return filteredActivities;
+        // return sortBy(filteredActivities, a => todayArs.includes(a.name)); // TODO вынести  в настройки
       })
     );
 
@@ -102,6 +125,8 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.portalService.setActivePortal(null);
   }
 
@@ -246,5 +271,40 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     }).onAction().subscribe(() => {
       this.tagsService.addTag(tag);
     });
+  }
+
+  openContextMainTagMenu(event: any) {
+    setTimeout(() => {
+      window.navigator.vibrate(50)
+      this.contextMenuPosition.x = Math.max(20, event.center.x - 120) + 'px';
+      this.contextMenuPosition.y = event.center.y + 20 + 'px';
+      this.mainTagMenuTrigger.openMenu();
+    }, 350);
+  }
+
+  toggleEditMainMenuComposition() {
+    this.isEditMode = true;
+  }
+
+  finishCompositionEdit() {
+    this.localStorageService.saveData(HIDDEN_LIST_VARIABLE_NAME, [...this.excludedActivities])
+    this.isEditMode = false;
+  }
+
+  onCheckboxClick(activity: IActivity) {
+    if (this.excludedActivities.has(activity.name)) {
+      this.excludedActivities.delete(activity.name)
+    } else {
+      this.excludedActivities.add(activity.name)
+    }
+
+  }
+
+  isActivityCanBeHidden(activity: IActivity) {
+    return this.isEditMode && this.isExistActivityTag(activity);
+  }
+
+  isExistActivityTag(activity: IActivity) {
+    return some(this.tags, t => t.name === activity.tag)
   }
 }

@@ -7,6 +7,7 @@ import {SettingsPageComponent} from "./settings-page/settings-page.component";
 import {SplitActivityToSubtasksFormComponent} from "./split-activity-to-subtasks-form/split-activity-to-subtasks-form.component";
 import {RemovedActivitiesComponent} from "./removed-activities/removed-activities.component";
 import {CreateTagFormComponent} from "./create-tag-form/create-tag-form.component";
+import {OneTimeActivitiesComponent} from "./one-time-activities/one-time-activities.component";
 
 const routes: Routes = [
   {
@@ -14,6 +15,13 @@ const routes: Routes = [
     component: MainPageComponent,
     data: {
       name: 'Главная'
+    }
+  },
+  {
+    path: 'one-time',
+    component: OneTimeActivitiesComponent,
+    data: {
+      name: 'Разовые'
     }
   },
   {

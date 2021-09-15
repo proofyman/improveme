@@ -16,38 +16,45 @@
         mat-icon-button>
         <mat-icon>check</mat-icon>
       </button>
-
-      <button
-        [routerLink]="['/create-tag']"
-        color="primary"
-        mat-icon-button>
-        <mat-icon>bookmark_outline</mat-icon>
-      </button>
     </ng-template>
 
-    <div class="__tab-heading">
-      <div
-        (click)="changeTabTo(TAB_INDEXES.COMMON)"
-        [class.__tab-link--current]="selectedTabIndex === TAB_INDEXES.COMMON && !tagFilter$.value"
-        class="__tab-link">
-        Основные
-      </div>
+    <div
+      *ngIf="!isOneTimeMode"
+      class="__tab-heading">
 
-      <div
-        [class.__tab-link--current]="selectedTabIndex === TAB_INDEXES.ONETIME"
-        (click)="changeTabTo(TAB_INDEXES.ONETIME)"
-        class="__tab-link">
-        Разовые
-      </div>
+      <ng-container *ngIf="!isEditMode; else editDoneBtn">
+        <div
+          (click)="changeTabTo(TAB_INDEXES.COMMON)"
+          (press)="openContextMainTagMenu($event)"
+          [class.__tab-link--current]="selectedTabIndex === TAB_INDEXES.COMMON && !tagFilter$.value"
+          class="__tab-link">
+          Основные
+        </div>
 
-      <div
-        *ngFor="let tag of tags$ | async"
-        [class.__tab-link--current]="tagFilter$.value === tag.name"
-        (press)="openContextTagMenu($event, tag)"
-        (click)="filterActivitiesByTag(tag)"
-        class="__tab-link __tab-link--{{tag.color}}">
-        {{tag.name}}
-      </div>
+        <div
+          *ngFor="let tag of tags$ | async"
+          [class.__tab-link--current]="tagFilter$.value === tag.name"
+          (press)="openContextTagMenu($event, tag)"
+          (click)="filterActivitiesByTag(tag)"
+          class="__tab-link __tab-link--{{tag.color}}">
+          {{tag.name}}
+        </div>
+
+        <button
+          [routerLink]="['/create-tag']"
+          color="primary"
+          mat-icon-button>
+          <mat-icon>tag</mat-icon>
+        </button>
+      </ng-container>
+
+      <ng-template #editDoneBtn>
+        <button
+          (click)="finishCompositionEdit()"
+          mat-stroked-button>
+          Завершить редактирование
+        </button>
+      </ng-template>
 
     </div>
 
@@ -67,20 +74,33 @@
       [matMenuTriggerFor]="tagMenu"
       class="__item-mat-menu-trigger"></div>
 
+    <div
+      style="visibility: hidden; position: fixed"
+      [style.left]="contextMenuPosition.x"
+      [style.top]="contextMenuPosition.y"
+      #mainTagMenuTrigger
+      [matMenuTriggerFor]="mainTagMenu"
+      class="__item-mat-menu-trigger"></div>
+
     <div class="__container">
       <mat-tab-group [(selectedIndex)]="selectedTabIndex">
         <mat-tab>
           <ng-container *ngIf="activities.length; else zeroState">
-            <app-activity-list-item
-              *ngFor="let activity of activities$ | async; trackBy: trackByName"
-              (press)="openContextMenu($event, activity)"
-              [isDoneToday]="isDoneToday(activity)"
-              [isEditMode]="isEditMode"
-              [name]="activity.name"
-              [points]="activity.points"
-              (score)="scoreActivity(activity)"
-            >
-            </app-activity-list-item>
+            <ng-container *ngFor="let activity of activities$ | async; trackBy: trackByName">
+              <app-activity-list-item
+                *ngIf="isEditMode || !excludedActivities.has(activity.name) || !isExistActivityTag(activity) || tagFilter$.value"
+                (press)="openContextMenu($event, activity)"
+                [isDoneToday]="isDoneToday(activity)"
+                [isEditMode]="isEditMode"
+                [name]="activity.name"
+                [points]="activity.points"
+                (score)="scoreActivity(activity)"
+                [isCheckboxVisible]="isActivityCanBeHidden(activity)"
+                (checkboxClick)="onCheckboxClick(activity)"
+                [isChecked]="!excludedActivities.has(activity.name)"
+              >
+              </app-activity-list-item>
+            </ng-container>
           </ng-container>
         </mat-tab>
         <mat-tab>
@@ -141,6 +161,16 @@
       (click)="deleteTag(tag)"
       mat-menu-item>
       Удалить
+    </button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #mainTagMenu="matMenu">
+  <ng-template matMenuContent>
+    <button
+      (click)="toggleEditMainMenuComposition()"
+      mat-menu-item>
+      Изменить состав вкладки
     </button>
   </ng-template>
 </mat-menu>

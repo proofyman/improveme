@@ -37,6 +37,7 @@ import {PortalModule} from "@angular/cdk/portal";
 import { CreateTagFormComponent } from './create-tag-form/create-tag-form.component';
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatOptionModule} from "@angular/material/core";
+import { OneTimeActivitiesComponent } from './one-time-activities/one-time-activities.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -64,7 +65,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     SplitActivityToSubtasksFormComponent,
     SpacerComponent,
     RemovedActivitiesComponent,
-    CreateTagFormComponent
+    CreateTagFormComponent,
+    OneTimeActivitiesComponent
   ],
   imports: [
     MatOptionModule,

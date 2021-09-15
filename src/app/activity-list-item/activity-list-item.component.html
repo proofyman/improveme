@@ -3,6 +3,12 @@
     [class.__description--readonly]="isReadonly"
     [class.__description--done-today]="isDoneToday"
     class="__description">
+    <mat-checkbox
+      *ngIf="isCheckboxVisible"
+      (change)="checkboxClick.emit()"
+      [checked]="isChecked"
+      class="__checkbox"
+      color="primary"></mat-checkbox>
     <span class="__name">{{name}}</span>
   </div>
 

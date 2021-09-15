@@ -26,6 +26,7 @@
 }
 
 .__tab-link {
+  box-sizing: border-box;
   display: inline-block;
   font-size: 14px;
   padding: 4px 8px;
@@ -38,12 +39,8 @@
   margin-right: 8px;
 }
 
-.__tab-link:last-child {
+.__tab-link:last-of-type {
   margin-right: 0;
-}
-
-.__tab-link--current {
-  background: #d9d3f0;
 }
 
 .__tab-link--RED {
@@ -51,7 +48,7 @@
   color: #f0464e;
 
   &.__tab-link--current {
-    background: #f0464e26;
+    box-shadow: 0px 0px 0px 4px #ff081340;
   }
 }
 
@@ -59,7 +56,7 @@
   border: solid 2px #487bd9;
   color: #487bd9;
   &.__tab-link--current {
-    background: #487bd933;
+    box-shadow: 0px 0px 0px 4px #487bd933;
   }
 }
 
@@ -67,7 +64,7 @@
   border: solid 2px #5fa167;
   color: #5fa167;
   &.__tab-link--current {
-    background: #5fa16730;
+    box-shadow: 0px 0px 0px 4px #008a1130;
   }
 }
 
@@ -75,7 +72,7 @@
   border: solid 2px #ff9000;
   color: #ae5a10;
   &.__tab-link--current {
-    background: #ff900030;
+    box-shadow: 0px 0px 0px 4px #ff900030;
   }
 }
 
@@ -84,7 +81,7 @@
   border-radius: 16px;
   color: #418999;
   &.__tab-link--current {
-    background: #4ec6e130;
+    box-shadow: 0px 0px 0px 4px #4ec6e152;
   }
 }
 
@@ -92,4 +89,8 @@
   border: solid 2px #673ab7;
   border-radius: 16px;
   color: #673ab7;
+}
+
+.__tab-link--current {
+  box-shadow: 0px 0px 0px 4px #d9d3f0;
 }

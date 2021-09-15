@@ -19,6 +19,10 @@ export class ActivityListItemComponent implements OnInit {
   subtasks!: ISubtask[];
   @Input()
   isReadonly: boolean = false;
+  @Input()
+  isCheckboxVisible: boolean = false;
+  @Input()
+  isChecked!: boolean;
 
   @Output()
   remove = new EventEmitter<void>();
@@ -26,6 +30,8 @@ export class ActivityListItemComponent implements OnInit {
   score = new EventEmitter<void>();
   @Output()
   onFinishSubtask = new EventEmitter<ISubtask>();
+  @Output()
+  checkboxClick = new EventEmitter<void>();
 
   get isShortForm () {
     return this.isReadonly || (this.subtasks?.length ?? 0) < 2;
