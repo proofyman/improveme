@@ -6,7 +6,7 @@ import {ActivatedRoute} from "@angular/router";
 import {Observable, Subject} from "rxjs";
 import {takeUntil} from "rxjs/operators";
 import {ITag, TagsService} from "../tags.service";
-import {some} from "lodash-es";
+import {find, some} from "lodash-es";
 
 
 function tagExistValidator (tags: ITag[]) {
@@ -42,10 +42,21 @@ export class CreateActivityShortFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let defaultTagToCreate = this.activatedRoute.snapshot.queryParamMap.get('tag');
+
     this.tags$ = this.tagsService.getTags();
+    this.tags$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(tags => {
+      this.currentTags = tags;
+    });
+
+    if (!find(this.currentTags, t => t.name === defaultTagToCreate)) {
+      defaultTagToCreate = '';
+    }
 
     this.form = this.formBuilder.group({
-      tag: [''],
+      tag: [defaultTagToCreate],
       name: ['', [Validators.required, Validators.minLength(3)]],
       points: [null, Validators.required],
       subtasks: [null],
@@ -66,9 +77,9 @@ export class CreateActivityShortFormComponent implements OnInit {
     this.tags$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(tags => {
-      this.currentTags = tags;
       this.form.get('tag')?.setValidators(tagExistValidator(tags));
     });
+
   }
 
   addActivity() {

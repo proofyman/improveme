@@ -4,6 +4,7 @@
       #actionsPortal
       cdkPortal>
       <button
+        [queryParams]="{tag: tagFilter$.value}"
         [routerLink]="['/create-activity']"
         color="primary"
         mat-icon-button>
@@ -42,6 +43,7 @@
 
         <button
           [routerLink]="['/create-tag']"
+          class="__add-tag-btn"
           color="primary"
           mat-icon-button>
           <mat-icon>tag</mat-icon>
@@ -82,23 +84,35 @@
       [matMenuTriggerFor]="mainTagMenu"
       class="__item-mat-menu-trigger"></div>
 
-    <div class="__container">
+    <div
+      cdkDropList
+      (cdkDropListDropped)="dropItem($event)"
+      class="__container">
       <mat-tab-group [(selectedIndex)]="selectedTabIndex">
         <mat-tab>
-          <ng-container *ngIf="activities.length; else zeroState">
+          <ng-container *ngIf="isAnyActivityVisible || isEditMode; else zeroState">
+
+            <div *ngIf="!(activities$ | async).length">
+              <ng-container *ngTemplateOutlet="zeroState"></ng-container>
+            </div>
+
             <ng-container *ngFor="let activity of activities$ | async; trackBy: trackByName">
               <app-activity-list-item
-                *ngIf="isEditMode || !excludedActivities.has(activity.name) || tagFilter$.value"
+                *ngIf="isEditMode || isEntryVisible(activity)"
                 (press)="openContextMenu($event, activity)"
+                cdkDrag
+                [cdkDragData]="activity"
+                [cdkDragDisabled]="!isEditMode"
                 [isDoneToday]="isDoneToday(activity)"
                 [isEditMode]="isEditMode"
                 [name]="activity.name"
                 [color]="getActivityColor(activity)"
                 [points]="activity.points"
+                [isReadonly]="isEditMode"
                 (score)="scoreActivity(activity)"
                 [isCheckboxVisible]="isActivityCanBeHidden(activity)"
                 (checkboxClick)="onCheckboxClick(activity)"
-                [isChecked]="!excludedActivities.has(activity.name)"
+                [isChecked]="isEntryVisible(activity)"
               >
               </app-activity-list-item>
             </ng-container>
@@ -153,6 +167,12 @@
 <mat-menu #tagMenu="matMenu">
   <ng-template matMenuContent let-tag="tag">
     <button
+      (click)="toggleEditMainMenuComposition()"
+      mat-menu-item>
+      Настроить вкладку
+    </button>
+
+    <button
       (click)="editTag(tag)"
       mat-menu-item>
       Редактировать
@@ -171,13 +191,19 @@
     <button
       (click)="toggleEditMainMenuComposition()"
       mat-menu-item>
-      Изменить состав вкладки
+      Настроить вкладку
     </button>
   </ng-template>
 </mat-menu>
 
 <ng-template #zeroState>
   <div class="__zero-state">
-    Нету активностей, которые бы можно было отметить.
+    <ng-container *ngIf="(activities$ | async).length; else emptyActivityList">
+      Все добавленные активности скрыты, <a [queryParams]="{tag: tagFilter$.value}" [routerLink]="'/create-activity'">создайте</a> новые, или <a href="javascript:void(0);" (click)="toggleEditMainMenuComposition()">отредактируйте</a> видимость текущих
+    </ng-container>
+
+    <ng-template #emptyActivityList>
+      Нету активностей, которые бы можно было отметить. <a [queryParams]="{tag: tagFilter$.value}" [routerLink]="'/create-activity'">Создать</a>
+    </ng-template>
   </div>
 </ng-template>

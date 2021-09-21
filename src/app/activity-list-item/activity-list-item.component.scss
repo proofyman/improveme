@@ -1,15 +1,15 @@
 @import "~src/variables";
 
 :host:nth-child(even) {
-  background: #f1f0f8;
+  background: #f1f0f85e;
 }
 
 :host {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 4px;
-  border-left: solid 2px rgba(0,0,0,0);
+  padding: 4px 4px 4px 8px;
+  border-left: solid 4px rgba(0,0,0,0);
 }
 
 :host:active {

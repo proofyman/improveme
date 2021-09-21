@@ -1,5 +1,5 @@
-import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, combineLatest, interval, Observable, Subject} from "rxjs";
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, combineLatest, EMPTY, interval, Observable, of, Subject} from "rxjs";
 import {
   ActivitiesService,
   IActivity,
@@ -8,7 +8,7 @@ import {
 } from "../activities.service";
 import {ModalsService} from "../modals.service";
 import {map, startWith, takeUntil} from "rxjs/operators";
-import {every, find, some, uniq} from 'lodash-es';
+import {every, find, some, sortBy, uniq} from 'lodash-es';
 import {ScoreNotFromListModalComponent} from "../score-not-from-list-modal/score-not-from-list-modal.component";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {RoutingService} from "../routing.service";
@@ -17,12 +17,22 @@ import {PortalService} from "../portal.service";
 import {CdkPortal, TemplatePortal} from "@angular/cdk/portal";
 import {ITag, TagsService} from "../tags.service";
 import {LocalStorageService} from "../local-storage.service";
+import {CdkDragDrop} from "@angular/cdk/drag-drop";
 
 const HIDDEN_LIST_VARIABLE_NAME = 'HIDDEN_LIST';
 
 enum TAB_INDEXES {
   COMMON = 0,
   ONETIME = 1
+}
+
+interface IActivityDescription {
+  isVisible: boolean;
+  order: number;
+}
+
+interface ITabState {
+  [key: string]: IActivityDescription
 }
 
 @Component({
@@ -45,6 +55,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   contextMenuPosition = { x: '0px', y: '0px' };
   activities$!: Observable<any>;
+  multiTimeActivities$!: Observable<IActivity[]>;
   oneTimeActivities$!: Observable<any>;
   todayActivities$!: Observable<string[]>;
   todayArNames: string[] = [];
@@ -55,8 +66,9 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   TAB_INDEXES = TAB_INDEXES;
   tagFilter$ = new BehaviorSubject<string>('');
   tags$!: Observable<ITag[]>;
-  excludedActivities = new Set<string>();
   destroy$ = new Subject<void>();
+  refreshList$ = new BehaviorSubject<void>(undefined);
+  tabsState = new Map();
 
   constructor(
     private activitiesService: ActivitiesService,
@@ -65,12 +77,18 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     private modalsService: ModalsService,
     private snackbar: MatSnackBar,
     private portalService: PortalService,
-    private tagsService: TagsService
+    private tagsService: TagsService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
+  get isAnyActivityVisible() {
+    return some(Object.values(this.getCurrentTabState()), desc => desc.isVisible);
+  }
+
   ngOnInit(): void {
-    this.excludedActivities = new Set(
-      this.localStorageService.getData(HIDDEN_LIST_VARIABLE_NAME) || []
+    this.tabsState = new Map(this.localStorageService.getData(HIDDEN_LIST_VARIABLE_NAME) || []);
+    this.multiTimeActivities$ = this.activitiesService.getActivities().pipe(
+      map(activities => activities.filter(a => !a.isOneTime))
     );
 
     this.tags$ = this.tagsService.getTags();
@@ -81,9 +99,25 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.selectedTabIndex = this.isOneTimeMode ? TAB_INDEXES.ONETIME : TAB_INDEXES.COMMON;
 
+    let init$ = combineLatest(
+      this.tags$,
+      this.multiTimeActivities$
+    )
+      .pipe(takeUntil(this.destroy$));
+
+    init$.subscribe(([tags, activities]) => {
+        tags.forEach(t => {
+          this.applyTabState(
+            activities.filter(a => a.tag === t.name),
+            t
+          );
+        });
+        this.applyTabState(activities);
+      });
+
     this.todayActivities$ = combineLatest(
       this.activitiesService.getActivityRecords(),
-      interval(1000).pipe(startWith(0)) // просто обновляем список каждую секунду, это вид проверки на конец дня
+      interval(10000).pipe(startWith(0)) // просто обновляем список каждую секунду, это вид проверки на конец дня
     ).pipe(
       map(([ars]) => {
         let records = ars
@@ -93,11 +127,11 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
       })
     );
     this.activities$ = combineLatest([
-      this.activitiesService.getActivities().pipe(
-        map(activities => activities.filter(a => !a.isOneTime))
-      ),
+      this.multiTimeActivities$,
       this.todayActivities$,
-      this.tagFilter$
+      this.tagFilter$,
+      this.refreshList$,
+      init$
     ]).pipe(
       map(([activities, todayArs, tagFilter]) => {
         let filteredActivities = activities;
@@ -105,9 +139,9 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
           filteredActivities = activities.filter(a => a.tag === tagFilter);
         }
 
-        return filteredActivities;
+        return sortBy(filteredActivities, el => this.getCurrentTabState()[el.name].order);
         // return sortBy(filteredActivities, a => todayArs.includes(a.name)); // TODO вынести  в настройки
-      })
+      }),
     );
 
     this.oneTimeActivities$ = this.activitiesService.getActivities().pipe(
@@ -128,6 +162,10 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     this.portalService.setActivePortal(null);
+  }
+
+  isEntryVisible(activity: IActivity) {
+    return this.getCurrentTabState()[activity.name].isVisible;
   }
 
   hideActivity(activity: IActivity) {
@@ -287,16 +325,12 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   finishCompositionEdit() {
-    this.localStorageService.saveData(HIDDEN_LIST_VARIABLE_NAME, [...this.excludedActivities])
+    this.localStorageService.saveData(HIDDEN_LIST_VARIABLE_NAME, [...this.tabsState.entries()]);
     this.isEditMode = false;
   }
 
   onCheckboxClick(activity: IActivity) {
-    if (this.excludedActivities.has(activity.name)) {
-      this.excludedActivities.delete(activity.name)
-    } else {
-      this.excludedActivities.add(activity.name)
-    }
+    this.getCurrentTabState()[activity.name].isVisible = !this.getCurrentTabState()[activity.name].isVisible;
 
   }
 
@@ -310,5 +344,71 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getActivityColor(activity: IActivity) {
     return this.tagFilter$.value ? undefined : find(this.tags, t => t.name === activity.tag)?.color;
+  }
+
+  dropItem($event: CdkDragDrop<any, any>) {
+    let currentIndex = $event.currentIndex;
+    let previousIndex = $event.previousIndex;
+    let tabState = this.getCurrentTabState();
+    let tabStateValues = Object.values(tabState);
+
+    //TODO копипаста
+    if (currentIndex > previousIndex) {
+      for (let i = previousIndex + 1; currentIndex >= i; i++) {
+        let tabStateEntry = find(tabStateValues, v => v.order === i);
+        if (tabStateEntry) {
+          tabStateEntry.order -=1;
+        }
+      }
+    } else {
+      for (let i = previousIndex - 1; currentIndex <= i; i--) {
+        let tabStateEntry = find(tabStateValues, v => v.order === i);
+        if (tabStateEntry) {
+          tabStateEntry.order +=1;
+        }
+      }
+    }
+
+    tabState[$event.item.data.name] = {
+      isVisible: tabState[$event.item.data.name].isVisible,
+      order: $event.currentIndex
+    };
+
+    this.refreshList$.next();
+  }
+
+  getCurrentTabState(): ITabState {
+    return this.tabsState.get(this.tagFilter$.value);
+    //!TODO при ренейме тега ренеймать табстейт
+  }
+
+  applyTabState(elements: IActivity[], tag?: ITag) {
+    let tagName = tag ? tag.name : '';
+
+    let currentTabState = this.tabsState.get(tagName);
+    if (!currentTabState) {
+      currentTabState = {};
+      this.tabsState.set(tagName, currentTabState);
+      elements.forEach((el, i) => {
+        currentTabState[el.name] = {
+          isVisible: true,
+          order: i
+        }
+      });
+    } else {
+      elements = sortBy(elements, el => currentTabState[el.name]?.order);
+      elements.forEach((el, i) => {
+        if (currentTabState[el.name]) {
+          currentTabState[el.name].order = i;
+        } else {
+          currentTabState[el.name] = {
+            isVisible: true,
+            order: i
+          };
+        }
+      });
+    }
+
+    return elements;
   }
 }
