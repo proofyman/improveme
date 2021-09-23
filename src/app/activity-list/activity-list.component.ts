@@ -19,7 +19,7 @@ import {ITag, TagsService} from "../tags.service";
 import {LocalStorageService} from "../local-storage.service";
 import {CdkDragDrop} from "@angular/cdk/drag-drop";
 
-const HIDDEN_LIST_VARIABLE_NAME = 'HIDDEN_LIST';
+const TAGS_SETTINGS_VARIABLE_NAME = 'TAGS_SETTINGS';
 
 enum TAB_INDEXES {
   COMMON = 0,
@@ -86,7 +86,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.tabsState = new Map(this.localStorageService.getData(HIDDEN_LIST_VARIABLE_NAME) || []);
+    this.tabsState = new Map(this.localStorageService.getData(TAGS_SETTINGS_VARIABLE_NAME) || []);
     this.multiTimeActivities$ = this.activitiesService.getActivities().pipe(
       map(activities => activities.filter(a => !a.isOneTime))
     );
@@ -325,7 +325,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   finishCompositionEdit() {
-    this.localStorageService.saveData(HIDDEN_LIST_VARIABLE_NAME, [...this.tabsState.entries()]);
+    this.localStorageService.saveData(TAGS_SETTINGS_VARIABLE_NAME, [...this.tabsState.entries()]);
     this.isEditMode = false;
   }
 
