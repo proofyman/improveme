@@ -43,6 +43,8 @@ export class CreateActivityShortFormComponent implements OnInit {
 
   ngOnInit(): void {
     let defaultTagToCreate = this.activatedRoute.snapshot.queryParamMap.get('tag');
+    let defaultIsOneTimeValue = this.activatedRoute.snapshot.queryParamMap.get('isOneTime');
+    defaultIsOneTimeValue = defaultIsOneTimeValue ? JSON.parse(defaultIsOneTimeValue) : false;
 
     this.tags$ = this.tagsService.getTags();
     this.tags$.pipe(
@@ -60,7 +62,7 @@ export class CreateActivityShortFormComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       points: [null, Validators.required],
       subtasks: [null],
-      isOneTime: false
+      isOneTime: defaultIsOneTimeValue
     });
 
     this.activatedRoute.params

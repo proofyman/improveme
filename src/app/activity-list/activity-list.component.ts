@@ -77,8 +77,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     private modalsService: ModalsService,
     private snackbar: MatSnackBar,
     private portalService: PortalService,
-    private tagsService: TagsService,
-    private changeDetectorRef: ChangeDetectorRef
+    private tagsService: TagsService
   ) {}
 
   get isAnyActivityVisible() {
@@ -168,13 +167,12 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.getCurrentTabState()[activity.name].isVisible;
   }
 
-  hideActivity(activity: IActivity) {
-    this.activitiesService.hideActivity(activity);
-    this.snackbar.open(`Активность спрятана`, 'Отменить', {
-      duration: 2000
-    }).onAction().subscribe(() => {
-      this.activitiesService.restoreActivity(activity);
-    });
+  deleteActivity(activity: IActivity) {
+    this.modalsService.yesNoModal('Точно удалить ?')
+      .then(() => {
+        this.activitiesService.deleteActivity(activity);
+      })
+      .catch(); // Нажатие кнопки "NO"
   }
 
   scoreActivity(activity: IActivity, subtask?: ISubtask) {
@@ -320,7 +318,10 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 350);
   }
 
-  toggleEditMainMenuComposition() {
+  toggleEditMainMenuComposition(tagName: string | null = null) {
+    let tag = this.tags.find(t => t.name === tagName) || null;
+
+    this.filterActivitiesByTag(tag);
     this.isEditMode = true;
   }
 

@@ -4,7 +4,7 @@
       #actionsPortal
       cdkPortal>
       <button
-        [queryParams]="{tag: tagFilter$.value}"
+        [queryParams]="{tag: tagFilter$.value, isOneTime: isOneTimeMode}"
         [routerLink]="['/create-activity']"
         color="primary"
         mat-icon-button>
@@ -99,7 +99,7 @@
             <ng-container *ngFor="let activity of activities$ | async; trackBy: trackByName">
               <app-activity-list-item
                 *ngIf="isEditMode || isEntryVisible(activity)"
-                (press)="openContextMenu($event, activity)"
+                (press)="!isEditMode && openContextMenu($event, activity)"
                 cdkDrag
                 [cdkDragData]="activity"
                 [cdkDragDisabled]="!isEditMode"
@@ -150,9 +150,9 @@
     </button>
 
     <button
-      (click)="hideActivity(activity)"
+      (click)="deleteActivity(activity)"
       mat-menu-item>
-      Скрыть
+      Удалить
     </button>
 
     <button
@@ -167,7 +167,7 @@
 <mat-menu #tagMenu="matMenu">
   <ng-template matMenuContent let-tag="tag">
     <button
-      (click)="toggleEditMainMenuComposition()"
+      (click)="toggleEditMainMenuComposition(tag.name)"
       mat-menu-item>
       Настроить вкладку
     </button>
@@ -198,12 +198,12 @@
 
 <ng-template #zeroState>
   <div class="__zero-state">
-    <ng-container *ngIf="(activities$ | async).length; else emptyActivityList">
-      Все добавленные активности скрыты, <a [queryParams]="{tag: tagFilter$.value}" [routerLink]="'/create-activity'">создайте</a> новые, или <a href="javascript:void(0);" (click)="toggleEditMainMenuComposition()">отредактируйте</a> видимость текущих
+    <ng-container *ngIf="(activities$ | async).length && !isOneTimeMode; else emptyActivityList">
+      Все добавленные активности скрыты, <a [queryParams]="{tag: tagFilter$.value, isOneTime: isOneTimeMode}" [routerLink]="'/create-activity'">создайте</a> новые, или <a href="javascript:void(0);" (click)="toggleEditMainMenuComposition(tagFilter$.value)">отредактируйте</a> видимость текущих
     </ng-container>
 
     <ng-template #emptyActivityList>
-      Нету активностей, которые бы можно было отметить. <a [queryParams]="{tag: tagFilter$.value}" [routerLink]="'/create-activity'">Создать</a>
+      Нету активностей, которые бы можно было отметить. <a [queryParams]="{tag: tagFilter$.value, isOneTime: isOneTimeMode}" [routerLink]="'/create-activity'">Создать</a>
     </ng-template>
   </div>
 </ng-template>
